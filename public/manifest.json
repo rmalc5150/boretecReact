@@ -1,0 +1,21 @@
+{
+  "name": "Boretec",
+  "short_name": "Boretec",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f9fafb",
+  "description": "Inventory, taskS, and CRM.",
+  "icons": [
+    {
+      "src": "/icons/boretec_white_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/boretec_white_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

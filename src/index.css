@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply md:max-w-screen-2xl;
+    @apply p-2;
+    @apply md:mx-auto;
+    @apply bg-gray-100;
+  }
