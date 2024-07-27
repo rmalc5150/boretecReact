@@ -23,7 +23,7 @@ const Sales = () => {
 
 
   return (
-    <div className={`${user === "bill" && 'bg-gray-300 rounded-sm'} p-2`}>
+    <div className={`${user === "bill" && 'bg-gray-300 rounded-sm'}`}>
       <Menu />
       <div className="">
           <div className="flex justify-center items-center w-full py-4">
