@@ -437,7 +437,7 @@ const InventoryCards = () => {
               <select
                 value={filterCategory}
                 onChange={handleCategoryChange}
-                className="w-full md:w-fit focus:outline-0"
+                className="w-full md:w-fit focus:outline-none focus:border-gray-500 appearance-none"
               >
                 <option value="All">All</option>
                 <option value="Auger">Augers</option>

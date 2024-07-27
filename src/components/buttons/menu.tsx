@@ -133,7 +133,7 @@ const Menu = () => {
         transition={{ duration: 0.3 }}
       >
         <div
-          className={`py-1 px-5 hover:font-medium text-center ${
+          className={`py-1 px-5 hover:font-medium text-center cursor-pointer ${
             !isOpen && "hidden"
           }`}
           onClick={handleTasks}
@@ -150,7 +150,7 @@ const Menu = () => {
         </div>
         {salesAdmin && (
           <div
-            className={`py-1 px-5 hover:font-medium text-center ${
+            className={`py-1 px-5 hover:font-medium text-center cursor-pointer ${
               !isOpen && "hidden"
             }`}
             onClick={handleSales}
@@ -163,7 +163,7 @@ const Menu = () => {
         )}
         {superAdmin && (
           <div
-            className={`py-1 px-5 hover:font-medium text-center ${
+            className={`py-1 px-5 hover:font-medium text-center cursor-pointer ${
               !isOpen && "hidden"
             }`}
             onClick={handleAnalytics}
@@ -172,7 +172,7 @@ const Menu = () => {
           </div>
         )}
         <div
-          className={`py-1 px-5 hover:font-medium text-center ${
+          className={`py-1 px-5 hover:font-medium text-center cursor-pointer ${
             !isOpen && "hidden"
           }`}
           onClick={handleLogout}

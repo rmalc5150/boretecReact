@@ -139,7 +139,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
   } else {
     setIsSaving(false);
     alert('We need to login to Quickbooks to refresh the credentials.')
-    router.push('https://appcenter.intuit.com/connect/oauth2?client_id=ABZfPF9RNNskcKhRenkn3Fdh4l7G9ebHtJj4o7gAan82N7A4zi&redirect_uri=http://localhost:3000/api/callback&response_type=code&scope=com.intuit.quickbooks.accounting&state=testState');
+    router.push('https://appcenter.intuit.com/connect/oauth2?client_id=ABIgT9WGOJyDM8vD1lGo4inh4gZE43LxBufFIpDCeZkQ8KbiLd&redirect_uri=http://inventory.boretec.com/api/callback&response_type=code&scope=com.intuit.quickbooks.accounting');
   }
   };
 
