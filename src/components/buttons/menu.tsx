@@ -87,7 +87,28 @@ const Menu = () => {
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
+  const handleSales = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent event from bubbling up
+    router.push("/sales");
+  };
+  const handleInventory = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent event from bubbling up
+    router.push("/inventory");
+  };
+  const handleAnalytics = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent event from bubbling up
+    router.push("/analytics");
+  };
+  const handleTasks = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent event from bubbling up
+    router.push("/tasks");
+  };
 
+  const handleLogout = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent event from bubbling up
+
+    router.push("/logout"); // Assuming you have a logout route to redirect to after logout
+  };
 
   // Variants for the dropdown menu
   const dropdownVariants = {
@@ -115,26 +136,29 @@ const Menu = () => {
           className={`py-1 px-5 hover:font-medium text-center ${
             !isOpen && "hidden"
           }`}
+          onClick={handleTasks}
         >
-          <a href="/tasks">Tasks</a>
+          Tasks
         </div>
         <div
-          className={`py-1 px-5 hover:font-medium text-center ${
+          className={`py-1 px-5 hover:font-medium text-center cursor-pointer ${
             !isOpen && "hidden"
           }`}
-        >
-          <a href="/inventory">Inventory</a>
+          onClick={handleInventory}
+        > Inventory
+          
         </div>
         {salesAdmin && (
           <div
             className={`py-1 px-5 hover:font-medium text-center ${
               !isOpen && "hidden"
             }`}
+            onClick={handleSales}
           >
-            <a href="/sales" className="flex">
+            
               Sales
               {outstandingEstimates > 0 && renderAlertBubble()}
-            </a>
+            
           </div>
         )}
         {superAdmin && (
@@ -142,16 +166,18 @@ const Menu = () => {
             className={`py-1 px-5 hover:font-medium text-center ${
               !isOpen && "hidden"
             }`}
+            onClick={handleAnalytics}
           >
-            <a href="/analytics">Analytics</a>
+            Analytics
           </div>
         )}
         <div
           className={`py-1 px-5 hover:font-medium text-center ${
             !isOpen && "hidden"
           }`}
+          onClick={handleLogout}
         >
-          <a href="/logout">Logout</a>
+          Logout
         </div>
       </motion.div>
 
