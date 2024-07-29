@@ -171,7 +171,7 @@ checkEmail()
 
   return (
     <section className="mt-5">
-      <div className={`sticky top-0 bg-gray-100 bg-opacity-95 py-1 ${user=="bill" && 'bg-300'}`}>
+      <div className={`sticky top-0 bg-gray-100 bg-opacity-95 py-1 ${user === "bill" && 'bg-300'}`}>
         <div className="mt-2 my-2 flex flex-col md:flex-row w-full space-y-2 md:space-y-0 md:space-x-2 items-center">
           <div className="w-full md:w-fit flex">
             <div className="bg-white w-full md:w-fit py-1 border px-2 border-gray-200 rounded-lg">
