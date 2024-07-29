@@ -533,20 +533,20 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
         <p className="py-1 bg-gray-100 rounded-md">
           Supplier measurements
         </p>
-        <div className={`grid ${rawMaterialType === "rectangular plate" || rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "round tubing" ? "grid-cols-3" : "grid-cols-3"}`}>
+        <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "round tubing" ? "grid-cols-3" : "grid-cols-3"}`}>
           {rawMaterialType === "rectangular plate" && (
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{length}</p>
+                <p>{length} {supplierUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{width}</p>
+                <p>{width} {supplierUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness}</p>
+                <p>{thickness} {supplierUnit}</p>
               </div>
             </>
           )}
@@ -554,15 +554,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Diameter</p>
-                <p>{diameter}</p>
+                <p>{diameter} {supplierUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{length}</p>
+                <p>{length} {supplierUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness}</p>
+                <p>{thickness} {supplierUnit}</p>
               </div>
             </>
           )}
@@ -570,19 +570,19 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{length}</p>
+                <p>{length} {supplierUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{width}</p>
+                <p>{width} {supplierUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Height</p>
-                <p>{height}</p>
+                <p>{height} {supplierUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness}</p>
+                <p>{thickness} {supplierUnit}</p>
               </div>
             </>
           )}
@@ -590,15 +590,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Leg1</p>
-                <p>{leg1}</p>
+                <p>{leg1} {supplierUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Leg2</p>
-                <p>{leg2}</p>
+                <p>{leg2} {supplierUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness}</p>
+                <p>{thickness} {supplierUnit}</p>
               </div>
             </>
           )}
@@ -607,20 +607,20 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
         <p className="text-center py-1 bg-gray-100 rounded-md">
           Boretec measurements
         </p>
-        <div className={`grid ${rawMaterialType === "rectangular plate" || rawMaterialType === "rectangular tubing" ? "grid-cols-3" : rawMaterialType === "round tubing" ? "grid-cols-2" : "grid-cols-3"}`}>
+        <div className={`grid ${rawMaterialType === "rectangular plate" || rawMaterialType === "rectangular tubing" ? "grid-cols-3" : rawMaterialType === "round tubing" ? "grid-cols-3" : "grid-cols-3"}`}>
           {rawMaterialType === "rectangular plate" && (
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{manufacturedLength}</p>
+                <p>{manufacturedLength} {manufacturedUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{manufacturedWidth}</p>
+                <p>{manufacturedWidth} {manufacturedUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness}</p>
+                <p>{manufacturedThickness} {manufacturedUnit}</p>
               </div>
             </>
           )}
@@ -628,15 +628,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Diameter</p>
-                <p>{manufacturedDiameter}</p>
+                <p>{manufacturedDiameter} {manufacturedUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{manufacturedLength}</p>
+                <p>{manufacturedLength} {manufacturedUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness}</p>
+                <p>{manufacturedThickness} {manufacturedUnit}</p>
               </div>
             </>
           )}
@@ -644,19 +644,19 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{manufacturedLength}</p>
+                <p>{manufacturedLength} {manufacturedUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{manufacturedWidth}</p>
+                <p>{manufacturedWidth} {manufacturedUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Height</p>
-                <p>{manufacturedHeight}</p>
+                <p>{manufacturedHeight} {manufacturedUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness}</p>
+                <p>{manufacturedThickness} {manufacturedUnit}</p>
               </div>
             </>
           )}
@@ -664,15 +664,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Leg1</p>
-                <p>{manufacturedLeg1}</p>
+                <p>{manufacturedLeg1} {manufacturedUnit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Leg2</p>
-                <p>{manufacturedLeg2}</p>
+                <p>{manufacturedLeg2} {manufacturedUnit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness}</p>
+                <p>{manufacturedThickness} {manufacturedUnit}</p>
               </div>
             </>
           )}
