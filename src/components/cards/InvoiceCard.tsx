@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import CompanyLogo from "../ui/companyLogo";
+import EmailEventSearch from "../buttons/EmailEventSearch";
 
 //db fields
 export interface invoiceCards {
@@ -37,6 +38,7 @@ export interface invoiceCards {
   clickTime: string;
   deliveredTime: string;
   qboUrl: string;
+  emailId: string;
   billAddressCountry: string | null;
   billAddressLine1: string;
   billAddressLine2: string;
@@ -67,6 +69,7 @@ interface ItemDetail {
   unitPrice: number;
   lineAmount: number;
 }
+
 
 const InvoiceCard: React.FC<invoiceCards> = ({
   discount,
@@ -110,6 +113,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
   trackingNumber,
   message,
   openTime,
+  emailId,
   clickTime,
   deliveredTime,
   qboUrl,
@@ -123,6 +127,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
 }) => {
   const [companyUrl, setCompanyUrl] = useState("");
   const [showDetails, setShowDetails] = useState(false);
+  const [showEmailEvents, setShowEmailEvents] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [trackingNumberArray, setTrackingNumberArray] = useState<
     string[] | null
@@ -269,11 +274,8 @@ const InvoiceCard: React.FC<invoiceCards> = ({
     window.location.href = mailtoLink;
   };
 
-  
   const today = new Date();
   const dueDateComparable = new Date(dueDate);
-
-
 
   return (
     <div className="bg-white my-4 rounded-lg overflow-hidden">
@@ -326,14 +328,11 @@ const InvoiceCard: React.FC<invoiceCards> = ({
           </div>
         </div>
       )}
-      {invoiceStatus !== "Paid" &&
-        !clickTime &&
-        deliveredTime &&
-        (
-          <div className="bg-violet-500 text-white text-center p-1 border-t border-white">
-            <p className="text-center">Unviewed</p>
-          </div>
-        )}
+      {invoiceStatus !== "Paid" && !clickTime && deliveredTime && (
+        <div className="bg-violet-500 text-white text-center p-1 border-t border-white">
+          <p className="text-center">Unviewed</p>
+        </div>
+      )}
       <div className="border-r border-l border-gray-200">
         {isMobile ? (
           <div className=" p-1">
@@ -496,7 +495,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
                         style: "decimal",
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      }).format((details.quantity*details.unitPrice))}
+                      }).format(details.quantity * details.unitPrice)}
                     </td>
                   )}
                 </tr>
@@ -507,30 +506,30 @@ const InvoiceCard: React.FC<invoiceCards> = ({
         <div className="grid md:grid-cols-2 pb-2">
           <div className="px-2 order-2 flex items-end md:order-1">
             <div className="text-md">
-            {deliveredTime && (
-              <p>
-                Delivered: {new Date(deliveredTime).toString().slice(4, 16)} at{" "}
-                {new Date(deliveredTime).toLocaleTimeString()}
-              </p>
-            )}
-            {openTime && (
-              <p>
-                Opened: {new Date(openTime).toString().slice(4, 16)} at{" "}
-                {new Date(openTime).toLocaleTimeString()}
-              </p>
-            )}
-            {clickTime && (
-              <p>
-                Clicked: {new Date(clickTime).toString().slice(4, 16)} at{" "}
-                {new Date(clickTime).toLocaleTimeString()}
-              </p>
-            )}
-                        {salesPerson && (
-              <p className="pt-2">
-                Sales Person:{" "}
-                {salesPerson.slice(0, 1).toUpperCase() + salesPerson.slice(1)}
-              </p>
-            )}
+              {/*{deliveredTime && (
+                <p>
+                  Delivered: {new Date(deliveredTime).toString().slice(4, 16)}{" "}
+                  at {new Date(deliveredTime).toLocaleTimeString()}
+                </p>
+              )}
+              {openTime && (
+                <p>
+                  Opened: {new Date(openTime).toString().slice(4, 16)} at{" "}
+                  {new Date(openTime).toLocaleTimeString()}
+                </p>
+              )}
+              {clickTime && (
+                <p>
+                  Clicked: {new Date(clickTime).toString().slice(4, 16)} at{" "}
+                  {new Date(clickTime).toLocaleTimeString()}
+                </p>
+              )}*/}
+              {salesPerson && (
+                <p className="pt-2">
+                  Sales Person:{" "}
+                  {salesPerson.slice(0, 1).toUpperCase() + salesPerson.slice(1)}
+                </p>
+              )}
             </div>
           </div>
           <div className="text-right px-2 order-1 md:order-2">
@@ -583,6 +582,8 @@ const InvoiceCard: React.FC<invoiceCards> = ({
             </p>
           </div>
         </div>
+
+
 
         {showDetails && (
           <div className="border-t bg-gray-50 border-gray-300">
@@ -648,25 +649,39 @@ const InvoiceCard: React.FC<invoiceCards> = ({
 
                 <p>{billAddressLine1}</p>
                 {billAddressLine2 && <p>{billAddressLine2}</p>}
-                {billAddressLine3 ? <p>{billAddressLine3}</p> : <p>{billAddressCity}, {billAddressState} {billAddressPostalCode}</p>}
-                {billAddressLine4 ? <p>{billAddressLine4}</p> : <p>{billAddressCountry}</p>}
+                {billAddressLine3 ? (
+                  <p>{billAddressLine3}</p>
+                ) : (
+                  <p>
+                    {billAddressCity}, {billAddressState}{" "}
+                    {billAddressPostalCode}
+                  </p>
+                )}
+                {billAddressLine4 ? (
+                  <p>{billAddressLine4}</p>
+                ) : (
+                  <p>{billAddressCountry}</p>
+                )}
               </div>
             </div>
             <div className="pb-2 py-1 px-2">
-          {message && <p><span className="font-medium">Message:</span> {message}</p>}
-        </div>
-
+              {message && (
+                <p>
+                  <span className="font-medium">Message:</span> {message}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
-        {isMobile ? (
+     
           <div className="bg-gray-50 border-t border-gray-300">
             {!showDetails && (
               <div
                 onClick={() => setShowDetails(true)}
                 className="text-center py-1 cursor-pointer"
               >
-                Details
+                Invoice Details
               </div>
             )}
             {showDetails && (
@@ -674,32 +689,41 @@ const InvoiceCard: React.FC<invoiceCards> = ({
                 onClick={() => setShowDetails(false)}
                 className="text-center py-1 cursor-pointer"
               >
-                Hide Details
+                Hide Invoice Details
+              </div>
+             
+            )}
+            </div>
+
+            {showEmailEvents && (
+              <EmailEventSearch emailId={emailId} isMobile = {isMobile} />
+        )}
+
+
+
+
+
+            {emailId && 
+              <div className="border-t border-gray-300">
+            {!showEmailEvents && (
+              <div
+                onClick={() => setShowEmailEvents(true)}
+                className="text-center py-1 cursor-pointer"
+              >
+                Delivery Details
               </div>
             )}
-          </div>
-        ) : (
-          <div className="text-gray-900 text-center bg-gray-50">
-            <div className="bg-gray-50 border-t border-gray-300">
-              {!showDetails && (
-                <div
-                  onClick={() => setShowDetails(true)}
-                  className="text-center py-1 cursor-pointer"
-                >
-                  Details
-                </div>
-              )}
-              {showDetails && (
-                <div
-                  onClick={() => setShowDetails(false)}
-                  className="text-center py-1 cursor-pointer"
-                >
-                  Hide Details
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+            {showEmailEvents && (
+              <div
+                onClick={() => setShowEmailEvents(false)}
+                className="text-center py-1 cursor-pointer"
+              >
+                Hide Delivery Details
+              </div>
+            )}
+            </div>}
+          
+      
       </div>
 
       <div
@@ -716,19 +740,21 @@ const InvoiceCard: React.FC<invoiceCards> = ({
           </div>
         )}
 
-        {pdf && <a href={pdf}>
-          <div className="md:border-r border-b md:border-b-0 border-gray-50 py-1">
-            <div className="text-center cursor-pointer">Download PDF</div>
-          </div>
-        </a>}
-        <div className={`${!pdf && 'col-span-2'}`}>
-        {customerPhone ? (
-          <a href={`tel:${customerPhone}`} style={{ textDecoration: "none" }}>
-            <div className="py-1">Call</div>
+        {pdf && (
+          <a href={pdf}>
+            <div className="md:border-r border-b md:border-b-0 border-gray-50 py-1">
+              <div className="text-center cursor-pointer">Download PDF</div>
+            </div>
           </a>
-        ) : (
-          <div className="py-1">No phone on file</div>
         )}
+        <div className={`${!pdf && "col-span-2"}`}>
+          {customerPhone ? (
+            <a href={`tel:${customerPhone}`} style={{ textDecoration: "none" }}>
+              <div className="py-1">Call</div>
+            </a>
+          ) : (
+            <div className="py-1">No phone on file</div>
+          )}
         </div>
       </div>
     </div>

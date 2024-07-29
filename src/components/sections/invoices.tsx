@@ -226,6 +226,7 @@ mobilePhone={invoice.mobilePhone}
   shipAddressLine4={invoice.shipAddressLine4}
   qboUrl = {invoice.qboUrl}
   openTime={invoice.openTime}
+  emailId = {invoice.emailId}
   deliveredTime={invoice.deliveredTime}
   clickTime={invoice.clickTime}
   billAddressCountry={invoice.billAddressCountry}
