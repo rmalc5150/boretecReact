@@ -704,7 +704,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
 
 
             {emailId && 
-              <div className="border-t border-gray-300">
+              <div className="bg-gray-50 border-t border-gray-300">
             {!showEmailEvents && (
               <div
                 onClick={() => setShowEmailEvents(true)}

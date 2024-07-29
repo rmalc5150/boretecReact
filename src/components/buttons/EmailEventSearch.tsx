@@ -54,21 +54,31 @@ const EstimateSearch: React.FC<EstimateSearchProps> = ({ emailId, isMobile }) =>
   return (
     <div>
     {isLoading && <p className="animate-pulse">Loading...</p>}
-    {events.length > 0 ? (
+    {events.length > 0 && (
 
           
-      <div className="text-center">
+      <div className="text-center text-md">
         {events.map((event) => (    
       <div className="border-t border-gray-300 grid md:grid-cols-4 grid-cols-2 py-1 px-2">
   
-            <p>{event.timestamp}</p>
-            <p>{event.event}</p>
-            {!isMobile && <p>{event.email}</p>}
+            <p>{event.timestamp.slice(0,10)}{" "}{new Date(event.timestamp).toLocaleTimeString()}</p>
+            
+          
             {!isMobile && <div>
-              {event.url.includes("intuit") && <p>invoice link</p>}
-              {event.url.includes("boretec") && <p>Boretec link</p>}
+              {event.url && event.url.includes("intuit") && <p>invoice link</p>}
+              {event.url && event.url.includes("boretec") && <p>Boretec link</p>}
+              {!event.url && <p>email</p>}
               
               </div>}
+              <div>
+              {event.event === "open" && <p>opened</p>}
+              {event.event === "click" && <p>clicked</p>}
+              {event.event === "delivered" && <p>delivered</p>}
+              
+              </div>
+              
+              {!isMobile && <p>{event.email}</p>}
+              
           </div>
 
     
@@ -76,7 +86,7 @@ const EstimateSearch: React.FC<EstimateSearchProps> = ({ emailId, isMobile }) =>
 
     ))}
      </div>
-  ): (<p className="p-1 text-center border-t border-gray-300 bg-white">No recent estimates.</p>)}
+  )}
     </div>
   );
 };
