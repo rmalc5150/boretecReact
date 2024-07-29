@@ -19,7 +19,7 @@ import InventorySearchBreakdown, {
 } from "../modals/inventorySearchBreakdown";
 import CompanyLogoOrder from "../ui/companyLogoOrder";
 import VendorSearch, { VendorItem } from "../modals/vendorSearch";
-
+import RawMaterialsDiv from "../modals/rawMaterialsDiv";
 
 interface Vendor {
   vName: string;
@@ -29,6 +29,7 @@ interface Vendor {
   vCost: number;
   vPaymentMethod: string;
 }
+
 
 interface InventoryCardEditableProps {
   partNumber: string;
@@ -63,6 +64,7 @@ interface InventoryCardEditableProps {
   breakdownInProgress: boolean;
   rAndD: boolean;
   royalties: boolean;
+  measurements: string;
 }
 
 function useAdminCheck() {
@@ -104,6 +106,7 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
     partsUrl,
     editor,
     allItems,
+    measurements,
   } = props;
 
   //declare variable and useStates
@@ -178,16 +181,10 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
     props.breakdownInProgress || false
   );
   const [rAndD, setRAnD] = useState(props.rAndD || false);
-  const [length, setLength] = useState('');
-  const [width, setWidth] = useState('');
-  const [height, setHeight] = useState('');
-  const [thickness, setThickness] = useState('');
-  const [manufacturedLength, setManufacturedLength] = useState('');
-  const [manufacturedWidth, setManufacturedWidth] = useState('');
-  const [manufacturedHeight, setManufacturedHeight] = useState('');
-  const [manufacturedThickness, setManufacturedThickness] = useState('');
-  const [rawMaterialType, setRawMaterialType] = useState('rectangular plate');
-  const [unit, setUnit] = useState('in');
+
+
+
+
 
   const handleProgressToggle = () => {
     setBreakdownInProgress(!breakdownInProgress);
@@ -950,83 +947,80 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
           </div>
         )}
 
-        
-          <div
-            className="grid grid-cols-3 px-2 mt-5"
-            onDoubleClick={() => setIsEditing(true)}
-          >
-            <div className="p-2 text-gray-700 text-center border-r border-gray-100">
-              <div>
-                <b>Quantity</b>
-              </div>
-              <p
-                contentEditable={isEditing}
-                onInput={() => setUnsavedChanges(true)}
-                suppressContentEditableWarning={true}
-                className={`quantity ${
-                  isEditing
-                    ? "bg-blue-100 text-blue-600 focus:outline-blue-600 rounded-md px-2 py-1 border border-blue-600"
-                    : ""
-                }`}
-              >
-                {quantity}
-              </p>
+        <div
+          className="grid grid-cols-3 px-2 mt-5"
+          onDoubleClick={() => setIsEditing(true)}
+        >
+          <div className="p-2 text-gray-700 text-center border-r border-gray-100">
+            <div>
+              <b>Quantity</b>
             </div>
-            <div className="p-2 text-gray-700 text-center border-r border-gray-100">
-              <div>
-                <b>PAR level</b>
-              </div>
-              <p
-                contentEditable={isEditing}
-                onInput={() => setUnsavedChanges(true)}
-                suppressContentEditableWarning={true}
-                className={`parLevel ${
-                  isEditing
-                    ? "bg-blue-100 text-blue-600 focus:outline-blue-600 rounded-md px-2 py-1 border border-blue-600"
-                    : ""
-                }`}
-              >
-                {parLevel}
-              </p>
+            <p
+              contentEditable={isEditing}
+              onInput={() => setUnsavedChanges(true)}
+              suppressContentEditableWarning={true}
+              className={`quantity ${
+                isEditing
+                  ? "bg-blue-100 text-blue-600 focus:outline-blue-600 rounded-md px-2 py-1 border border-blue-600"
+                  : ""
+              }`}
+            >
+              {quantity}
+            </p>
+          </div>
+          <div className="p-2 text-gray-700 text-center border-r border-gray-100">
+            <div>
+              <b>PAR level</b>
             </div>
-            <div className="p-2 text-gray-700 text-center">
+            <p
+              contentEditable={isEditing}
+              onInput={() => setUnsavedChanges(true)}
+              suppressContentEditableWarning={true}
+              className={`parLevel ${
+                isEditing
+                  ? "bg-blue-100 text-blue-600 focus:outline-blue-600 rounded-md px-2 py-1 border border-blue-600"
+                  : ""
+              }`}
+            >
+              {parLevel}
+            </p>
+          </div>
+          <div className="p-2 text-gray-700 text-center">
+            <div>
               <div>
-                <div>
-                  <b>Cost</b>
+                <b>Cost</b>
+              </div>
+              {isEditing && type === "buy" ? (
+                <div className="flex justify-center items-center">
+                  <p>$</p>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={cost}
+                    onChange={(e) => {
+                      setCost(parseFloat(e.target.value)); // Assuming you have a function to update the price
+                      setUnsavedChanges(true);
+                    }}
+                    disabled={!isEditing || !admin}
+                    className="bg-blue-100 text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
+                  />
                 </div>
-                {isEditing && type === "buy" ? (
-                  <div className="flex justify-center items-center">
-                    <p>$</p>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={cost}
-                      onChange={(e) => {
-                        setCost(parseFloat(e.target.value)); // Assuming you have a function to update the price
-                        setUnsavedChanges(true);
-                      }}
-                      disabled={!isEditing || !admin}
-                      className="bg-blue-100 text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex justify-center items-center">
-                    <p>
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(cost)}
-                    </p>
-                  </div>
-                )}
-                {isEditing && type === "build" && (
-                  <p className="text-xs font-light text-center">
-                    from Breakdown
+              ) : (
+                <div className="flex justify-center items-center">
+                  <p>
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(cost)}
                   </p>
-                )}
-              </div>
+                </div>
+              )}
+              {isEditing && type === "build" && (
+                <p className="text-xs font-light text-center">from Breakdown</p>
+              )}
             </div>
-            {category !== "Raw Material" ? (
+          </div>
+          {category !== "Raw Material" ? (
             <div className="p-2 text-gray-700 text-center border-r border-t border-gray-100">
               <div>
                 <b>Retail Price</b>
@@ -1045,19 +1039,6 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
                     disabled={!isEditing || !admin}
                     className="bg-blue-100 text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
                   />
-
-                  {/*<p
-                contentEditable={isEditing && admin}
-                onInput={() => setUnsavedChanges(true)}
-                suppressContentEditableWarning={true}
-                className={`retailPrice ${
-                  isEditing && admin
-                    ? 'bg-blue-100 text-blue-600 focus:outline-blue-600 rounded-md px-2 py-1 border border-blue-600 flex-grow'
-                    : ''
-                }`}
-              >
-                {retailPrice}
-              </p>*/}
                 </div>
               ) : (
                 <div className="flex justify-center items-center">
@@ -1069,91 +1050,12 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
                   </p>
                 </div>
               )}
-            </div>):(
-              <div className="col-span-3">
-                {isEditing ? (
-      <div className="border-gray-100">
-         <p className="text-center py-1 bg-gray-100 rounded-md mb-2">Raw material type and units</p>
-        <div className="flex space-x-2 mb-2">
-       
-          <select value={rawMaterialType} onChange={(e) => setRawMaterialType(e.target.value)} className="text-center outline-none font-bold focus:outline-none focus:ring-0 w-full mb-2">
-            <option value="rectangular plate">Rectangular Plate</option>
-            <option value="round tubing">Round Tubing</option>
-            <option value="rectangular tubing">Rectangular Tubing</option>
-            <option value="angle iron">Angle Iron</option>
-          </select>
-
-     
-          <select value={unit} onChange={(e) => setUnit(e.target.value)} className="text-center outline-none font-bold focus:outline-none focus:ring-0 w-full mb-2">
-            <option value="in">Inches (in)</option>
-            <option value="cm">Centimeters (cm)</option>
-            <option value="m">Meters (m)</option>
-            <option value="pound">Pounds (lb)</option>
-            <option value="kg">Kilograms (kg)</option>
-          </select>
-          </div>
-      <p className="text-center py-1 bg-gray-100 rounded-md">Raw measurements</p>
-      <div className="grid grid-cols-4">
-  <div className="p-2 text-center font-bold">Length <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={length} onChange={(e) => setLength(e.target.value)} /></div>
-  <div className="p-2 text-center font-bold">Width <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={width} onChange={(e) => setWidth(e.target.value)} /></div>
-  <div className="p-2 text-center font-bold">Height <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={height} onChange={(e) => setHeight(e.target.value)} /></div>
-  <div className="p-2 text-center font-bold">Thickness <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={thickness} onChange={(e) => setThickness(e.target.value)} /></div>
-</div>
-<p className="text-center py-1 bg-gray-100 rounded-md">Manufactured measurements</p>
-<div className="grid grid-cols-4">
-  <div className="p-2 text-center font-bold">Length <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedLength} onChange={(e) => setManufacturedLength(e.target.value)} /></div>
-  <div className="p-2 text-center font-bold">Width <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedWidth} onChange={(e) => setManufacturedWidth(e.target.value)} /></div>
-  <div className="p-2 text-center font-bold">Height <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedHeight} onChange={(e) => setManufacturedHeight(e.target.value)} /></div>
-  <div className="p-2 text-center font-bold">Thickness <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedThickness} onChange={(e) => setManufacturedThickness(e.target.value)} /></div>
-</div>
-      <p>conversion here</p>
-    </div>
-                ) : (
- <div className="text-center">
- <p className="py-1 bg-gray-100 rounded-md">Raw measurements</p>
- <div className="grid grid-cols-4 text-center">
-   <div className="border-r p-2">
-     <p className="font-bold">Length</p>
-     <p>{length}</p>
-   </div>
-   <div className="border-r p-2">
-     <p className="font-bold">Width</p>
-     <p>{width}</p>
-   </div>
-   <div className="border-r p-2">
-     <p className="font-bold">Height</p>
-     <p>{height}</p>
-   </div>
-   <div className="p-2">
-     <p className="font-bold">Thick</p>
-     <p>{thickness}</p>
-   </div>
- </div>
- <p className="py-1 bg-gray-100 rounded-md">Manufactured measurements</p>
- <div className="grid grid-cols-4 text-center">
-   <div className="border-r p-2">
-     <p className="font-bold">Length</p>
-     <p>{manufacturedLength}</p>
-   </div>
-   <div className="border-r p-2">
-     <p className="font-bold">Width</p>
-     <p>{manufacturedWidth}</p>
-   </div>
-   <div className="border-r p-2">
-     <p className="font-bold">Height</p>
-     <p>{manufacturedHeight}</p>
-   </div>
-   <div className="p-2">
-     <p className="font-bold">Thick</p>
-     <p>{manufacturedThickness}</p>
-   </div>
- </div>
- <p className="py-1 bg-gray-100 rounded-md mb-2">1 raw item &rarr; 25 inventory items</p>
-</div>
-                )}
-              </div>
-            )}
-            {category !== "Raw Material"  && <div className="p-2 text-gray-700 text-center border-r border-t border-gray-100">
+            </div>
+          ) : (
+            <RawMaterialsDiv measurements={measurements} isEditing={isEditing}/>
+          )}
+          {category !== "Raw Material" && (
+            <div className="p-2 text-gray-700 text-center border-r border-t border-gray-100">
               <div>
                 <b>Weight</b>
               </div>
@@ -1172,8 +1074,10 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
                 </p>
                 <p>lbs</p>
               </div>
-            </div>}
-            {category !== "Raw Material" && <div className="p-2 text-gray-700 text-center border-t border-gray-100">
+            </div>
+          )}
+          {category !== "Raw Material" && (
+            <div className="p-2 text-gray-700 text-center border-t border-gray-100">
               <div>
                 <b>Lead Time</b>
               </div>
@@ -1192,50 +1096,35 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
                 </p>
                 <p>&nbsp;days</p>
               </div>
-            </div>}
-          </div>
-       
-        {isEditing && admin && (
-          <div className="text-center text-gray-700 p-2">
-            Dynamic Retail Price: <b>${(cost * 3.5).toFixed(2)}</b>
-          </div>
-        )}
-        {isEditing && admin && (
-          <div className="p-2 text-gray-700 flex justify-center items-center">
-            <div className="flex">
-              <p>Set the Retail Price</p>
-              <select
-                value={dynamicPricing}
-                onChange={(e) => {
-                  setDynamicPricing(e.target.value);
-                  setUnsavedChanges(true);
-                }}
-                className="dynamicPricing outline-none font-bold focus:outline-none focus:ring-0 mx-1"
-              >
-                <option value="dynamic">dynamically</option>
-                <option value="manual">manually</option>
-              </select>
+            </div>
+          )}
+        </div>
+
+        {isEditing && admin && category !== "Raw Material" && (
+          <div>
+            <div className="text-center text-gray-700 p-2">
+              Dynamic Retail Price: <b>${(cost * 3.5).toFixed(2)}</b>
+            </div>
+
+            <div className="p-2 text-gray-700 flex justify-center items-center">
+              <div className="flex">
+                <p>Set the Retail Price</p>
+                <select
+                  value={dynamicPricing}
+                  onChange={(e) => {
+                    setDynamicPricing(e.target.value);
+                    setUnsavedChanges(true);
+                  }}
+                  className="dynamicPricing outline-none font-bold focus:outline-none focus:ring-0 mx-1"
+                >
+                  <option value="dynamic">dynamically</option>
+                  <option value="manual">manually</option>
+                </select>
+              </div>
             </div>
           </div>
         )}
-        {/*<div
-          className={`border-t border-gray-100 text-gray-700 p-2 ${
-            !upsell && !isEditing ? 'hidden' : ''
-          }`}
-        >
-          <div className="font-bold tracking-tight text-center">
-            Upsell with
-          </div>
-          <div className="py-2 text-center">
-            <p>(in progress...)</p>
-            {isEditing && (
-              <div className="text-xs text-gray-400 text-center mt-1">
-                <p>Enter part numbers.</p>
-                <p className="font-light">Separate with commas.</p>
-              </div>
-            )}
-          </div>
-        </div>*/}
+
 
         {isEditing && (
           <div className="col-span-3">
