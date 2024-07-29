@@ -178,6 +178,16 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
     props.breakdownInProgress || false
   );
   const [rAndD, setRAnD] = useState(props.rAndD || false);
+  const [length, setLength] = useState('');
+  const [width, setWidth] = useState('');
+  const [height, setHeight] = useState('');
+  const [thickness, setThickness] = useState('');
+  const [manufacturedLength, setManufacturedLength] = useState('');
+  const [manufacturedWidth, setManufacturedWidth] = useState('');
+  const [manufacturedHeight, setManufacturedHeight] = useState('');
+  const [manufacturedThickness, setManufacturedThickness] = useState('');
+  const [rawMaterialType, setRawMaterialType] = useState('rectangular plate');
+  const [unit, setUnit] = useState('in');
 
   const handleProgressToggle = () => {
     setBreakdownInProgress(!breakdownInProgress);
@@ -1061,42 +1071,86 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
               )}
             </div>):(
               <div className="col-span-3">
-                {isEditing ? (<div className="border-gray-100">
-                  <p>drop down for type (rectangular plate, round tubing, rectangular tubing, angle iron)</p>
-                  <p>drop down for unit (in, cm, m, pound, kg...)</p>
-                  <p>Raw measurements:</p>
-                  <div className="grid grid-cols-4">
-                  <div className="bg-green-400 h-10">length: input</div>
-                  <div className="bg-emerald-400 h-10">width: input</div>
-                  <div className="bg-yellow-400 h-10">height: input</div>
-                  <div className="bg-amber-400 h-10">thickness: input</div>
-                  </div>
-                  <p>Manufactured measurements:</p>
-                  <div className="grid grid-cols-4">
-                  <div className="bg-green-400 h-10">length: input</div>
-                  <div className="bg-emerald-400 h-10">width: input</div>
-                  <div className="bg-yellow-400 h-10">height: input</div>
-                  <div className="bg-amber-400 h-10">thickness: input</div>
-                  </div>
-                  <p>conversion here</p>
-                </div>) : (
-                  <div className="text-center">
-                    <p className="py-1 bg-gray-100 rounded-md">Raw measurements</p>
-                  <div className="grid grid-cols-4 text-center">
-                  <div className="border-r p-2"><p className="font-bold">Length</p><p>24in</p></div>
-                  <div className="border-r p-2"><p className="font-bold">Width</p><p>24in</p></div>
-                  <div className="border-r p-2"><p className="font-bold">Height</p><p>24in</p></div>
-                  <div className="p-2"><p className="font-bold">Thick</p><p>2in</p></div>
-                  </div>
-                  <p className="py-1 bg-gray-100 rounded-md">Manufactured measurements</p>
-                  <div className="grid grid-cols-4 text-center">
-                  <div className="border-r p-2"><p className="font-bold">Length</p><p>2in</p></div>
-                  <div className="border-r p-2"><p className="font-bold">Width</p><p>2in</p></div>
-                  <div className="border-r p-2"><p className="font-bold">Height</p><p>2in</p></div>
-                  <div className="p-2"><p className="font-bold">Thick</p><p>.5in</p></div>
-                  </div>
-                  <p className="py-1 bg-gray-100 rounded-md mb-2">1 raw item &rarr; 25 inventory items</p>
-                  </div>)}
+                {isEditing ? (
+      <div className="border-gray-100">
+         <p className="text-center py-1 bg-gray-100 rounded-md mb-2">Raw material type and units</p>
+        <div className="flex space-x-2 mb-2">
+       
+          <select value={rawMaterialType} onChange={(e) => setRawMaterialType(e.target.value)} className="text-center outline-none font-bold focus:outline-none focus:ring-0 w-full mb-2">
+            <option value="rectangular plate">Rectangular Plate</option>
+            <option value="round tubing">Round Tubing</option>
+            <option value="rectangular tubing">Rectangular Tubing</option>
+            <option value="angle iron">Angle Iron</option>
+          </select>
+
+     
+          <select value={unit} onChange={(e) => setUnit(e.target.value)} className="text-center outline-none font-bold focus:outline-none focus:ring-0 w-full mb-2">
+            <option value="in">Inches (in)</option>
+            <option value="cm">Centimeters (cm)</option>
+            <option value="m">Meters (m)</option>
+            <option value="pound">Pounds (lb)</option>
+            <option value="kg">Kilograms (kg)</option>
+          </select>
+          </div>
+      <p className="text-center py-1 bg-gray-100 rounded-md">Raw measurements</p>
+      <div className="grid grid-cols-4">
+  <div className="p-2 text-center font-bold">Length <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={length} onChange={(e) => setLength(e.target.value)} /></div>
+  <div className="p-2 text-center font-bold">Width <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={width} onChange={(e) => setWidth(e.target.value)} /></div>
+  <div className="p-2 text-center font-bold">Height <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={height} onChange={(e) => setHeight(e.target.value)} /></div>
+  <div className="p-2 text-center font-bold">Thickness <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={thickness} onChange={(e) => setThickness(e.target.value)} /></div>
+</div>
+<p className="text-center py-1 bg-gray-100 rounded-md">Manufactured measurements</p>
+<div className="grid grid-cols-4">
+  <div className="p-2 text-center font-bold">Length <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedLength} onChange={(e) => setManufacturedLength(e.target.value)} /></div>
+  <div className="p-2 text-center font-bold">Width <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedWidth} onChange={(e) => setManufacturedWidth(e.target.value)} /></div>
+  <div className="p-2 text-center font-bold">Height <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedHeight} onChange={(e) => setManufacturedHeight(e.target.value)} /></div>
+  <div className="p-2 text-center font-bold">Thickness <input className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full" type="text" value={manufacturedThickness} onChange={(e) => setManufacturedThickness(e.target.value)} /></div>
+</div>
+      <p>conversion here</p>
+    </div>
+                ) : (
+ <div className="text-center">
+ <p className="py-1 bg-gray-100 rounded-md">Raw measurements</p>
+ <div className="grid grid-cols-4 text-center">
+   <div className="border-r p-2">
+     <p className="font-bold">Length</p>
+     <p>{length}</p>
+   </div>
+   <div className="border-r p-2">
+     <p className="font-bold">Width</p>
+     <p>{width}</p>
+   </div>
+   <div className="border-r p-2">
+     <p className="font-bold">Height</p>
+     <p>{height}</p>
+   </div>
+   <div className="p-2">
+     <p className="font-bold">Thick</p>
+     <p>{thickness}</p>
+   </div>
+ </div>
+ <p className="py-1 bg-gray-100 rounded-md">Manufactured measurements</p>
+ <div className="grid grid-cols-4 text-center">
+   <div className="border-r p-2">
+     <p className="font-bold">Length</p>
+     <p>{manufacturedLength}</p>
+   </div>
+   <div className="border-r p-2">
+     <p className="font-bold">Width</p>
+     <p>{manufacturedWidth}</p>
+   </div>
+   <div className="border-r p-2">
+     <p className="font-bold">Height</p>
+     <p>{manufacturedHeight}</p>
+   </div>
+   <div className="p-2">
+     <p className="font-bold">Thick</p>
+     <p>{manufacturedThickness}</p>
+   </div>
+ </div>
+ <p className="py-1 bg-gray-100 rounded-md mb-2">1 raw item &rarr; 25 inventory items</p>
+</div>
+                )}
               </div>
             )}
             {category !== "Raw Material"  && <div className="p-2 text-gray-700 text-center border-r border-t border-gray-100">
