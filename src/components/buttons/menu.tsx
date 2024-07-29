@@ -118,9 +118,9 @@ const Menu = () => {
 
   // Render function for alert bubble
   const renderAlertBubble = () => (
-    <span className="top-1 right-4 absolute -mt-2 -mr-2 bg-pink-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+    <div className="top-1 right-4 absolute -mt-2 -mr-2 bg-pink-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
       {outstandingEstimates}
-    </span>
+    </div>
   );
 
   return (
@@ -155,10 +155,13 @@ const Menu = () => {
             }`}
             onClick={handleSales}
           >
-            
-              Sales
-              {outstandingEstimates > 0 && renderAlertBubble()}
-            
+            <div className="flex">
+              <div>Sales</div>
+              {outstandingEstimates > 0 &&  <div className="-mt-2 -mr-2 bg-pink-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+      {outstandingEstimates}
+    </div>}
+             
+              </div>
           </div>
         )}
         {superAdmin && (

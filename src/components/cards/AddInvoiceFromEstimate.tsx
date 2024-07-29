@@ -1,28 +1,30 @@
-import React, { useState, useEffect } from 'react'
-import { InvokeCommand, type InvokeCommandInput } from '@aws-sdk/client-lambda'
-import { lambdaClient } from '../../lib/amazon'
-import InventorySearch from '../modals/inventorySearchEstimate2Invoice'
-import CustomerSearch, { CustomerCard } from '../modals/customersSearch'
-import Cookies from 'js-cookie'
-import DatePicker from 'react-datepicker'
+import React, { useState, useEffect } from "react";
+import { InvokeCommand, type InvokeCommandInput } from "@aws-sdk/client-lambda";
+import { lambdaClient } from "../../lib/amazon";
+import InventorySearch from "../modals/inventorySearchEstimate2Invoice";
+import CustomerSearch, { CustomerCard } from "../modals/customersSearch";
+import Cookies from "js-cookie";
+import DatePicker from "react-datepicker";
+import { useRouter } from "next/router";
+import { fetchAccessToken } from "../tokenFunctions";
 
 interface EstimateCardAddProps {
-  items: string
-  selectedCustomer: string
-  estimateID: number
-  discount: number
-  onClose: () => void
+  items: string;
+  selectedCustomer: string;
+  estimateID: number;
+  discount: number;
+  onClose: () => void;
 }
 
 interface InventoryItem {
-  partNumber: string
-  name: string
-  quantity: number
-  retailPrice: number
-  images: string
-  qboID: number
-  weight: number
-  isVisible: boolean
+  partNumber: string;
+  name: string;
+  quantity: number;
+  retailPrice: number;
+  images: string;
+  qboID: number;
+  weight: number;
+  isVisible: boolean;
 }
 const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
   items,
@@ -32,135 +34,141 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
   onClose,
 }) => {
   const [updatedSelectedCustomer, setSelectedCustomer] =
-    useState<CustomerCard | null>(JSON.parse(selectedCustomer))
+    useState<CustomerCard | null>(JSON.parse(selectedCustomer));
   const [dueDate, setdueDate] = useState<Date>(
     new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000)
-  )
-  const [shipDate, setShipDate] = useState<Date | null>(new Date())
-  const [trackingNumber, setTrackingNumber] = useState<string[]>([])
-  const [newTrackingNumber, setNewTracking] = useState('')
-  const [shippingCost, setShippingCost] = useState<number>(0)
-  const [shippingMethod, setShippingMethod] = useState<string>('fedex')
-  const [purchaseOrder, setpurchaseOrder] = useState<string>('')
-  const [message, setMessage] = useState<string>('')
-  const [emails, setEmails] = useState<string[]>([])
-  const [discount, setDiscount] = useState(passedDiscount || 0)
-  const [emailInputValue, setEmailInputValue] = useState('')
-  const [showItemsHeader, setShowItemsHeader] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [showAddCustomer, setShowAddCustomer] = useState(false)
-  const [showAddItems, setShowAddItems] = useState(false)
-  const [showPreview, setShowPreview] = useState(true)
-  const [updatedItems, setItems] = useState<InventoryItem[]>(JSON.parse(items))
-  const [isSaving, setIsSaving] = useState(false)
-  const [ccPayment, setCCpayment] = useState(false)
-  
-
+  );
+  const [shipDate, setShipDate] = useState<Date | null>(new Date());
+  const [trackingNumber, setTrackingNumber] = useState<string[]>([]);
+  const [newTrackingNumber, setNewTracking] = useState("");
+  const [shippingCost, setShippingCost] = useState<number>(0);
+  const [shippingMethod, setShippingMethod] = useState<string>("fedex");
+  const [purchaseOrder, setpurchaseOrder] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [emails, setEmails] = useState<string[]>([]);
+  const [discount, setDiscount] = useState(passedDiscount || 0);
+  const [emailInputValue, setEmailInputValue] = useState("");
+  const [showItemsHeader, setShowItemsHeader] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
+  const [showAddItems, setShowAddItems] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+  const [updatedItems, setItems] = useState<InventoryItem[]>(JSON.parse(items));
+  const [isSaving, setIsSaving] = useState(false);
+  const [ccPayment, setCCpayment] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     checkItemQboIDs(updatedItems);
     const updateCustomerQboID = async () => {
       if (updatedSelectedCustomer && updatedSelectedCustomer.qboID !== 0) {
         return; // If customer is not selected or qboID already exists, do not fetch.
-      } else if (updatedSelectedCustomer){
-  
-      const qboID = await fetchQboID();
-      //console.log(qboID);
-      if (qboID) {
-        setSelectedCustomer({
-          ...updatedSelectedCustomer,
-          qboID: qboID,
-        })
+      } else if (updatedSelectedCustomer) {
+        const qboID = await fetchQboID();
+        //console.log(qboID);
+        if (qboID) {
+          setSelectedCustomer({
+            ...updatedSelectedCustomer,
+            qboID: qboID,
+          });
+        }
       }
-    }
     };
-  
+
     updateCustomerQboID();
     // Function to detect if the device is mobile
     const isMobile = () => {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
-      )
-    }
-    setIsMobile(isMobile())
-  }, [])
+      );
+    };
+    setIsMobile(isMobile());
+  }, []);
 
   const addTracking = (newValue: string) => {
-    setTrackingNumber([...trackingNumber, newValue])
-    setNewTracking('')
-  }
+    setTrackingNumber([...trackingNumber, newValue]);
+    setNewTracking("");
+  };
 
   const handleTrackingChange = (index: number, newValue: string) => {
     if (trackingNumber.length === 0) {
       // If the array is empty, add the new value as the first item
-      setTrackingNumber([newValue])
+      setTrackingNumber([newValue]);
     } else {
       // Otherwise, update the existing serial number
-      const updatedTracking = [...trackingNumber]
-      updatedTracking[index] = newValue
-      setTrackingNumber(updatedTracking)
+      const updatedTracking = [...trackingNumber];
+      updatedTracking[index] = newValue;
+      setTrackingNumber(updatedTracking);
     }
-  }
+  };
 
   const nameCheck = () => {
-    const email = Cookies.get('email')
+    const email = Cookies.get("email");
     if (email) {
-      const extractedUsername = email.split('@')[0].toLowerCase()
-      return extractedUsername
+      const extractedUsername = email.split("@")[0].toLowerCase();
+      return extractedUsername;
     }
-  }
+  };
 
   const fetchQboID = async (): Promise<number | null> => {
     const payload = {
       displayName: updatedSelectedCustomer?.companyName,
       primaryEmail: updatedSelectedCustomer?.primaryEmail,
     };
-  //console.log(payload);
+    //console.log(payload);
     const params = {
-      FunctionName: 'boretec_fetch_Cust_qboID', //change to qbo lambda.
+      FunctionName: "boretec_fetch_Cust_qboID", //change to qbo lambda.
       Payload: JSON.stringify(payload),
     };
-  
+
     try {
       const command = new InvokeCommand(params);
       const response = await lambdaClient.send(command);
-      const applicationResponse = JSON.parse(new TextDecoder().decode(response.Payload));
+      const applicationResponse = JSON.parse(
+        new TextDecoder().decode(response.Payload)
+      );
       //const responseBody = JSON.parse(applicationResponse.body);
-  
-      return applicationResponse.length > 0 ? parseInt(applicationResponse[0].qboID, 10) : null;
+
+      return applicationResponse.length > 0
+        ? parseInt(applicationResponse[0].qboID, 10)
+        : null;
     } catch (error) {
-      console.error('Failed to fetch QuickBooks Customer ID: ', error);
+      console.error("Failed to fetch QuickBooks Customer ID: ", error);
       return null; // Return null on error to handle gracefully
     }
   };
 
-  const fetchItemQboID = async (partNumber:string) => {
+  const fetchItemQboID = async (partNumber: string) => {
     const payload = {
-      partNumber
+      partNumber,
     };
-  //console.log(payload);
+    //console.log(payload);
     const params = {
-      FunctionName: 'boretec_fetch_item_qboID', //change to qbo lambda.
+      FunctionName: "boretec_fetch_item_qboID", //change to qbo lambda.
       Payload: JSON.stringify(payload),
     };
-  
+
     try {
       const command = new InvokeCommand(params);
       const response = await lambdaClient.send(command);
-      const applicationResponse = JSON.parse(new TextDecoder().decode(response.Payload));
+      const applicationResponse = JSON.parse(
+        new TextDecoder().decode(response.Payload)
+      );
       //const responseBody = JSON.parse(applicationResponse.body);
       //console.log(applicationResponse);
-      return applicationResponse.length > 0 ? parseInt(applicationResponse[0].qboID, 10) : null;
+      return applicationResponse.length > 0
+        ? parseInt(applicationResponse[0].qboID, 10)
+        : null;
     } catch (error) {
-      console.error('Failed to fetch QuickBooks item ID: ', error);
+      console.error("Failed to fetch QuickBooks item ID: ", error);
       return null; // Return null on error to handle gracefully
     }
   };
 
   const checkItemQboIDs = async (items: InventoryItem[]) => {
     const updatedItemsWithQboIDs = await Promise.all(
-      items.map(async item => {
+      items.map(async (item) => {
         // Check if the item already has a valid qboID
         if (!item.qboID || item.qboID === 0) {
           // Fetch qboID for the item if not present
@@ -179,194 +187,201 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
     // Update the state with the new items array
     setItems(updatedItemsWithQboIDs);
   };
-  
-
 
   const setToConverted = async () => {
     const payload = {
-      estimateID
+      estimateID,
     };
-  //console.log(payload);
+    //console.log(payload);
     const params = {
-      FunctionName: 'boretec_convert_estimate', //change to qbo lambda.
+      FunctionName: "boretec_convert_estimate", //change to qbo lambda.
       Payload: JSON.stringify(payload),
     };
-  
+
     try {
       const command = new InvokeCommand(params);
       const response = await lambdaClient.send(command);
-      const applicationResponse = JSON.parse(new TextDecoder().decode(response.Payload));
+      const applicationResponse = JSON.parse(
+        new TextDecoder().decode(response.Payload)
+      );
       //const responseBody = JSON.parse(applicationResponse.body);
-      
     } catch (error) {
-      console.error('Failed to fetch QuickBooks Customer ID: ', error);
+      console.error("Failed to fetch QuickBooks Customer ID: ", error);
       return null; // Return null on error to handle gracefully
     }
   };
-  
- 
-
 
   const handleSend = async () => {
-    let setTrackingNumbers = JSON.stringify(trackingNumber)
-    if (newTrackingNumber && trackingNumber.length === 0) {
-      setTrackingNumbers = JSON.stringify([newTrackingNumber])
-    }
-    if (
-      trackingNumber.length === 0 &&
-      shippingMethod !== 'pickUp' &&
-      !newTrackingNumber
-    ) {
-      alert('Add a tracking number.')
-      return
-    }
-    setIsSaving(true)
-    const payload = {
-      updatedItems,
-      updatedSelectedCustomer,
-      tax: calculateTax().toFixed(2),
-      subtotal: calculateSubTotal(),
-      total:
-        calculateTax() +
-        calculateSubTotal() -
-        (calculateSubTotal() * discount) / 100 +
-        shippingCost,
-      shippingCost: (shippingCost * 1.15).toFixed(2),
-      shipDate,
-      shippingMethod,
-      trackingNumber: setTrackingNumbers,
-      discount,
-      message,
-      emails,
-      dueDate,
-      dateCreated: new Date(),
-      origin: nameCheck(),
-      ccPayment,
-      purchaseOrder,
-    }
-
-    //console.log(JSON.stringify(payload));
-
-    const params = {
-      FunctionName: 'Boretec_create_invoice_api', //change to qbo lambda.
-      Payload: JSON.stringify(payload),
-    }
-
-    try {
-      const command = new InvokeCommand(params)
-
-      const response = await lambdaClient.send(command)
-
-      //console.log('Lambda response:', response);
-
-      // Parse the Payload to get the application-level response
-      const applicationResponse = JSON.parse(
-        new TextDecoder().decode(response.Payload)
-      )
-
-      //console.log('Application response:', applicationResponse);
-      const responseBody = JSON.parse(applicationResponse.body)
-
-      if (applicationResponse.statusCode === 200) {
-        //console.log('Item added successfully.');
-        setToConverted()
-        onClose()
-      } else {
-        setIsSaving(false)
-        alert('Failed to process invoice: ' + responseBody)
+    setIsSaving(true);
+    const fetchedAccessToken = await fetchAccessToken();
+    if (fetchedAccessToken) {
+      let setTrackingNumbers = JSON.stringify(trackingNumber);
+      if (newTrackingNumber && trackingNumber.length === 0) {
+        setTrackingNumbers = JSON.stringify([newTrackingNumber]);
       }
-    } catch (error) {
-      alert('Failed to add or send the invoice. ' + error)
-      console.error('Error invoking Lambda function:', error)
+      if (
+        trackingNumber.length === 0 &&
+        shippingMethod !== "pickUp" &&
+        !newTrackingNumber
+      ) {
+        alert("Add a tracking number.");
+        return;
+      }
+      setIsSaving(true);
+      const payload = {
+        updatedItems,
+        updatedSelectedCustomer,
+        tax: calculateTax().toFixed(2),
+        subtotal: calculateSubTotal(),
+        total:
+          calculateTax() +
+          calculateSubTotal() -
+          (calculateSubTotal() * discount) / 100 +
+          shippingCost,
+        shippingCost: (shippingCost * 1.15).toFixed(2),
+        shipDate,
+        shippingMethod,
+        trackingNumber: setTrackingNumbers,
+        discount,
+        message,
+        emails,
+        dueDate,
+        dateCreated: new Date(),
+        origin: nameCheck(),
+        ccPayment,
+        purchaseOrder,
+        accessToken: fetchedAccessToken
+      };
+
+      console.log(JSON.stringify(payload));
+
+      const params = {
+        FunctionName: "createAndInsertInvoiceToShipTransaction", //change to qbo lambda.
+        Payload: JSON.stringify(payload),
+      };
+
+      try {
+        const command = new InvokeCommand(params);
+
+        const response = await lambdaClient.send(command);
+
+        //console.log('Lambda response:', response);
+
+        // Parse the Payload to get the application-level response
+        const applicationResponse = JSON.parse(
+          new TextDecoder().decode(response.Payload)
+        );
+
+        const stringifiedApplicationResponse = JSON.stringify(applicationResponse);
+  
+
+        if (applicationResponse.statusCode === 200) {
+          //console.log('Item added successfully.');
+          setToConverted();
+          onClose();
+        } else {
+          setIsSaving(false);
+          alert("Failed to process invoice: " + stringifiedApplicationResponse);
+        }
+      } catch (error) {
+        alert("Failed to add or send the invoice. " + error);
+        console.error("Error invoking Lambda function:", error);
+      }
+    } else {
+      setIsSaving(false);
+      alert("We need to login to Quickbooks to refresh the credentials.");
+      router.push(
+        "https://appcenter.intuit.com/connect/oauth2?client_id=ABIgT9WGOJyDM8vD1lGo4inh4gZE43LxBufFIpDCeZkQ8KbiLd&redirect_uri=http://inventory.boretec.com/api/callback&response_type=code&scope=com.intuit.quickbooks.accounting"
+      );
     }
-  }
+  };
 
   const handleCustomerClick = (customer: CustomerCard) => {
-    setSelectedCustomer(customer)
+    setSelectedCustomer(customer);
     const keysToCheck: (keyof CustomerCard)[] = [
-      'displayName',
-      'familyName',
-      'givenName',
-      'companyName',
-      'primaryEmail',
-      'primaryPhone',
-      'billAddressCity',
-      'billAddressLine1',
-      'billAddressState',
-      'billAddressPostalCode',
-      'country',
-      'shipAddressState',
-      'shipAddressCity',
-      'shipAddressLine1',
-      'shipAddressPostalCode',
-    ]
+      "displayName",
+      "familyName",
+      "givenName",
+      "companyName",
+      "primaryEmail",
+      "primaryPhone",
+      "billAddressCity",
+      "billAddressLine1",
+      "billAddressState",
+      "billAddressPostalCode",
+      "country",
+      "shipAddressState",
+      "shipAddressCity",
+      "shipAddressLine1",
+      "shipAddressPostalCode",
+    ];
 
     // Check each key for the customer
     for (const key of keysToCheck) {
       // If the key is not present, or is null, or is an empty string, set isEditing to true
-      if (customer[key] === null || customer[key] === '') {
-        setIsEditing(true)
-        return // Exit the function early since we've found a field that meets the criteria
+      if (customer[key] === null || customer[key] === "") {
+        setIsEditing(true);
+        return; // Exit the function early since we've found a field that meets the criteria
       }
     }
-  }
+  };
 
   const changeCustomer = () => {
-    setIsEditing(true)
-  }
+    setIsEditing(true);
+  };
 
   const handleInventoryClick = (updatedItems: InventoryItem[]) => {
     // Create a new array that includes all existing updatedItems plus the new item
 
     // Update the state with the new array
-    setItems(updatedItems)
-    setShowAddItems(false)
-    setShowPreview(true)
+    setItems(updatedItems);
+    setShowAddItems(false);
+    setShowPreview(true);
     //console.log(updatedItems);
 
     // Optionally, log the updated updatedItems array to the console
     //console.log(updatedItems)
-  }
+  };
 
   const removeItem = (itemToRemove: InventoryItem) => {
     // Create a new array excluding the item to remove
     const visibleItems = updatedItems.filter(
       (item) => item.partNumber !== itemToRemove.partNumber
-    )
+    );
 
     // Update the state with the new array
-    setItems(visibleItems)
-  }
+    setItems(visibleItems);
+  };
 
   const handleItemsChange = (index: number, quantity: string) => {
     const newInventory = updatedItems.map((item, idx) => {
       if (idx === index) {
-        return { ...item, quantity: parseInt(quantity, 10) || 0 }
+        return { ...item, quantity: parseInt(quantity, 10) || 0 };
       }
-      return item
-    })
+      return item;
+    });
 
-    setItems(newInventory)
-  }
+    setItems(newInventory);
+  };
 
   const invokeLambdaFunction = async (selectedCustomer: any) => {
-    const {isVisible, ...otherFields} = selectedCustomer
+    const { isVisible, ...otherFields } = selectedCustomer;
     const params: InvokeCommandInput = {
-      FunctionName: 'boretec_update_customer_rds_only',
-      Payload: JSON.stringify({payload: otherFields}),
-    }
+      FunctionName: "boretec_update_customer_rds_only",
+      Payload: JSON.stringify({ payload: otherFields }),
+    };
     //console.log(payload);
     try {
-      const command = new InvokeCommand(params)
-      const response = await lambdaClient.send(command)
-      const payloadString = new TextDecoder().decode(response.Payload)
-      const payloadObject = JSON.parse(payloadString)
+      const command = new InvokeCommand(params);
+      const response = await lambdaClient.send(command);
+      const payloadString = new TextDecoder().decode(response.Payload);
+      const payloadObject = JSON.parse(payloadString);
       //console.log(payloadObject);
-      return payloadObject
+      return payloadObject;
     } catch (error) {
-      throw new Error('Error invoking Lambda function')
+      throw new Error("Error invoking Lambda function");
     }
-  }
+  };
 
   /*const invokeLambdaFunctionQBO = async (payload: any) => {
     const params: InvokeCommandInput = {
@@ -388,38 +403,38 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
 
   const saveCustomerDetails = async () => {
     if (
-      updatedSelectedCustomer?.customerType === '' ||
+      updatedSelectedCustomer?.customerType === "" ||
       updatedSelectedCustomer?.customerType === null
     ) {
       setSelectedCustomer({
         ...updatedSelectedCustomer,
-        customerType: 'Direct',
-      })
+        customerType: "Direct",
+      });
     }
 
     const keysToCheck: (keyof CustomerCard)[] = [
-      'familyName',
-      'givenName',
-      'companyName',
-      'primaryEmail',
-      'primaryPhone',
-      'billAddressCity',
-      'billAddressLine1',
-      'billAddressState',
-      'billAddressPostalCode',
-      'country',
-      'shipAddressState',
-      'shipAddressCity',
-      'shipAddressLine1',
-      'shipAddressPostalCode',
-    ]
+      "familyName",
+      "givenName",
+      "companyName",
+      "primaryEmail",
+      "primaryPhone",
+      "billAddressCity",
+      "billAddressLine1",
+      "billAddressState",
+      "billAddressPostalCode",
+      "country",
+      "shipAddressState",
+      "shipAddressCity",
+      "shipAddressLine1",
+      "shipAddressPostalCode",
+    ];
     if (
-      updatedSelectedCustomer?.customerType === 'Reseller' &&
+      updatedSelectedCustomer?.customerType === "Reseller" &&
       (updatedSelectedCustomer.taxResaleNumber === 0 ||
         updatedSelectedCustomer.taxResaleNumber === null)
     ) {
-      alert('All resellers must have a Tax Resale Number.')
-      return
+      alert("All resellers must have a Tax Resale Number.");
+      return;
     }
     // Check each key for the customer
     for (const key of keysToCheck) {
@@ -427,101 +442,99 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
       if (
         !updatedSelectedCustomer ||
         updatedSelectedCustomer[key] === null ||
-        updatedSelectedCustomer[key] === ''
+        updatedSelectedCustomer[key] === ""
       ) {
-        alert('All blue fields must be filled in.')
-        return // Exit the function early since we've found a field that meets the criteria
+        alert("All blue fields must be filled in.");
+        return; // Exit the function early since we've found a field that meets the criteria
       }
     }
 
-    setIsSaving(true)
+    setIsSaving(true);
 
     try {
-      const response = await invokeLambdaFunction(updatedSelectedCustomer)
+      const response = await invokeLambdaFunction(updatedSelectedCustomer);
       //const responseQBO = await invokeLambdaFunctionQBO(updatedSelectedCustomer)
       if (response.statusCode === 200) {
         //&& responseQBO.statusCode === 200
-        setIsSaving(false)
-        setIsEditing(false)
+        setIsSaving(false);
+        setIsEditing(false);
       } else {
-        alert(`There was a problem saving: ${response}`)
+        alert(`There was a problem saving: ${response}`);
       }
     } catch (error) {
-      console.error('Error invoking Lambda function', error)
-      setIsSaving(false)
+      console.error("Error invoking Lambda function", error);
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmailInputValue(event.target.value)
-  }
+    setEmailInputValue(event.target.value);
+  };
 
   const handleAddEmail = () => {
-    if (emailInputValue.trim() !== '') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (emailInputValue.trim() !== "") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (emailRegex.test(emailInputValue.trim())) {
-        setEmails([...emails, emailInputValue.trim()])
-        setEmailInputValue('')
+        setEmails([...emails, emailInputValue.trim()]);
+        setEmailInputValue("");
       } else {
         // Handle invalid email format
-        alert('Please enter a valid email address.')
+        alert("Please enter a valid email address.");
       }
     }
-  }
+  };
 
   const handleExpirationChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const days = parseInt(event.target.value)
+    const days = parseInt(event.target.value);
     if (!isNaN(days)) {
-      const currentDate = new Date()
+      const currentDate = new Date();
       const dueDate = new Date(
         currentDate.getTime() + days * 24 * 60 * 60 * 1000
-      )
-      setdueDate(dueDate)
+      );
+      setdueDate(dueDate);
     }
-  }
+  };
 
   const calculateSubTotal = () => {
     return updatedItems.reduce((total, item) => {
-      return total + item.quantity * item.retailPrice
-    }, 0)
-  }
+      return total + item.quantity * item.retailPrice;
+    }, 0);
+  };
 
   const calculateTotalWeight = () => {
     return updatedItems.reduce((total, item) => {
-      return total + item.weight
-    }, 0)
-  }
+      return total + item.weight;
+    }, 0);
+  };
 
   const calculateTax = () => {
-    let tax
-    if (updatedSelectedCustomer?.customerType === 'Reseller') {
-      tax = 0
+    let tax;
+    if (updatedSelectedCustomer?.customerType === "Reseller") {
+      tax = 0;
     } else if (
-      updatedSelectedCustomer?.shipAddressState.toLowerCase() === 'sc'
+      updatedSelectedCustomer?.shipAddressState.toLowerCase() === "sc"
     ) {
-      tax = (calculateSubTotal() - discount) * 0.07
+      tax = (calculateSubTotal() - discount) * 0.07;
     } else if (
       updatedSelectedCustomer?.shipAddressState.toLowerCase() ===
-      'south carolina'
+      "south carolina"
     ) {
-      tax = (calculateSubTotal() - discount) * 0.07
-    } else if (
-      shippingMethod === 'pickUp'
-    ) {
-      tax = (calculateSubTotal() - discount) * 0.07
-    } else  {
-      tax = 0
+      tax = (calculateSubTotal() - discount) * 0.07;
+    } else if (shippingMethod === "pickUp") {
+      tax = (calculateSubTotal() - discount) * 0.07;
+    } else {
+      tax = 0;
     }
 
-    return tax
-  }
+    return tax;
+  };
 
   const handleDiscountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(event.target.value)
-    setDiscount(isNaN(value) ? 0 : value)
-  }
+    const value = parseFloat(event.target.value);
+    setDiscount(isNaN(value) ? 0 : value);
+  };
 
   const copyBillingAddress = () => {
     setSelectedCustomer((prevState) => {
@@ -529,17 +542,17 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
       if (prevState) {
         return {
           ...prevState,
-          shipAddressLine1: prevState.billAddressLine1 ?? '',
-          shipAddressLine2: prevState.billAddressLine2 ?? '',
-          shipAddressCity: prevState.billAddressCity ?? '',
-          shipAddressState: prevState.billAddressState ?? '',
-          shipAddressPostalCode: prevState.billAddressPostalCode ?? '',
+          shipAddressLine1: prevState.billAddressLine1 ?? "",
+          shipAddressLine2: prevState.billAddressLine2 ?? "",
+          shipAddressCity: prevState.billAddressCity ?? "",
+          shipAddressState: prevState.billAddressState ?? "",
+          shipAddressPostalCode: prevState.billAddressPostalCode ?? "",
           // Make sure to provide appropriate fallbacks for all other properties that could be undefined
-        }
+        };
       }
-      return prevState // Return prevState directly if it's null
-    })
-  }
+      return prevState; // Return prevState directly if it's null
+    });
+  };
 
   return (
     <div className="bg-white lg:text-sm">
@@ -547,7 +560,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
         <button
           className="text-lg text-center font-medium px-4 py-1 text-white bg-indigo-500"
           onClick={() => {
-            setIsEditing(true)
+            setIsEditing(true);
           }}
         >
           Edit Customer Info
@@ -555,12 +568,12 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
 
         <button
           className={`text-lg text-center font-medium px-4 py-1 text-white bg-indigo-600 ${
-            !showItemsHeader ? 'opacity-20' : ''
+            !showItemsHeader ? "opacity-20" : ""
           }`}
           disabled={!showItemsHeader}
           onClick={() => {
-            setShowAddItems(true)
-            setIsEditing(false)
+            setShowAddItems(true);
+            setIsEditing(false);
           }}
         >
           Add Items
@@ -568,7 +581,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
 
         <button
           className={`text-lg text-center font-medium px-4 py-1 text-white bg-indigo-700 ${
-            !showPreview ? 'opacity-20' : ''
+            !showPreview ? "opacity-20" : ""
           }`}
           onClick={() => setShowAddItems(false)}
         >
@@ -634,7 +647,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="givenName"
                         type="text"
-                        value={updatedSelectedCustomer.givenName || ''}
+                        value={updatedSelectedCustomer.givenName || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -647,7 +660,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="familyName"
                         type="text"
-                        value={updatedSelectedCustomer.familyName || ''}
+                        value={updatedSelectedCustomer.familyName || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -660,7 +673,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="companyName"
                         type="text"
-                        value={updatedSelectedCustomer.companyName || ''}
+                        value={updatedSelectedCustomer.companyName || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -673,7 +686,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="primaryEmail"
                         type="email"
-                        value={updatedSelectedCustomer.primaryEmail || ''}
+                        value={updatedSelectedCustomer.primaryEmail || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -686,7 +699,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="mobilePhone"
                         type="tel"
-                        value={updatedSelectedCustomer.mobilePhone || ''}
+                        value={updatedSelectedCustomer.mobilePhone || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -699,7 +712,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="primaryPhone"
                         type="tel"
-                        value={updatedSelectedCustomer.primaryPhone || ''}
+                        value={updatedSelectedCustomer.primaryPhone || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -729,7 +742,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                   <p className="font-medium mt-2">Customer Type:</p>
                   {isEditing ? (
                     <select
-                      defaultValue={updatedSelectedCustomer.customerType || ''}
+                      defaultValue={updatedSelectedCustomer.customerType || ""}
                       onChange={(e) =>
                         setSelectedCustomer({
                           ...updatedSelectedCustomer,
@@ -738,8 +751,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       }
                       className={`customerType ${
                         isEditing
-                          ? 'bg-indigo-100 text-indigo-600 focus:outline-indigo-600 rounded-md px-2 py-1 border border-indigo-600 flex-grow'
-                          : ''
+                          ? "bg-indigo-100 text-indigo-600 focus:outline-indigo-600 rounded-md px-2 py-1 border border-indigo-600 flex-grow"
+                          : ""
                       }`}
                     >
                       <option value="Direct">Direct</option>
@@ -748,14 +761,14 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                   ) : (
                     <p>{updatedSelectedCustomer.customerType}</p>
                   )}
-                  {updatedSelectedCustomer.customerType === 'Reseller' && (
+                  {updatedSelectedCustomer.customerType === "Reseller" && (
                     <div>
                       <p className="font-medium">Tax Resale Number:</p>
                       {isEditing ? (
                         <input
                           type="text"
                           defaultValue={
-                            updatedSelectedCustomer.taxResaleNumber || ''
+                            updatedSelectedCustomer.taxResaleNumber || ""
                           }
                           onChange={(e) =>
                             setSelectedCustomer({
@@ -765,8 +778,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                           }
                           className={`taxResaleNumber ${
                             isEditing
-                              ? 'bg-indigo-100 text-indigo-600 focus:outline-indigo-600 rounded-md px-2 py-1 border border-indigo-600 flex-grow'
-                              : ''
+                              ? "bg-indigo-100 text-indigo-600 focus:outline-indigo-600 rounded-md px-2 py-1 border border-indigo-600 flex-grow"
+                              : ""
                           }`}
                         />
                       ) : (
@@ -785,7 +798,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="billAddressLine1"
                         type="text"
-                        value={updatedSelectedCustomer.billAddressLine1 || ''}
+                        value={updatedSelectedCustomer.billAddressLine1 || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -798,7 +811,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="billAddressLine2"
                         type="text"
-                        value={updatedSelectedCustomer.billAddressLine2 || ''}
+                        value={updatedSelectedCustomer.billAddressLine2 || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -811,7 +824,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="billAddressCity"
                         type="text"
-                        value={updatedSelectedCustomer.billAddressCity || ''}
+                        value={updatedSelectedCustomer.billAddressCity || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -824,7 +837,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="billAddressState"
                         type="text"
-                        value={updatedSelectedCustomer.billAddressState || ''}
+                        value={updatedSelectedCustomer.billAddressState || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -838,7 +851,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                         id="billAddressPostalCode"
                         type="text"
                         value={
-                          updatedSelectedCustomer.billAddressPostalCode || ''
+                          updatedSelectedCustomer.billAddressPostalCode || ""
                         }
                         onChange={(e) =>
                           setSelectedCustomer({
@@ -852,7 +865,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="country"
                         type="text"
-                        value={updatedSelectedCustomer.country || ''}
+                        value={updatedSelectedCustomer.country || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -883,7 +896,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="shipAddressLine1"
                         type="text"
-                        value={updatedSelectedCustomer.shipAddressLine1 || ''}
+                        value={updatedSelectedCustomer.shipAddressLine1 || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -896,7 +909,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="shipAddressLine2"
                         type="text"
-                        value={updatedSelectedCustomer.shipAddressLine2 || ''}
+                        value={updatedSelectedCustomer.shipAddressLine2 || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -909,7 +922,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="shipAddressCity"
                         type="text"
-                        value={updatedSelectedCustomer.shipAddressCity || ''}
+                        value={updatedSelectedCustomer.shipAddressCity || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -922,7 +935,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       <input
                         id="shipAddressState"
                         type="text"
-                        value={updatedSelectedCustomer.shipAddressState || ''}
+                        value={updatedSelectedCustomer.shipAddressState || ""}
                         onChange={(e) =>
                           setSelectedCustomer({
                             ...updatedSelectedCustomer,
@@ -936,7 +949,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                         id="shipAddressPostalCode"
                         type="text"
                         value={
-                          updatedSelectedCustomer.shipAddressPostalCode || ''
+                          updatedSelectedCustomer.shipAddressPostalCode || ""
                         }
                         onChange={(e) =>
                           setSelectedCustomer({
@@ -995,9 +1008,9 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
             </button>
             <button
               onClick={() => {
-                setShowAddCustomer(false)
-                setShowAddItems(true)
-                setShowItemsHeader(true)
+                setShowAddCustomer(false);
+                setShowAddItems(true);
+                setShowItemsHeader(true);
               }}
               className="bg-gray-800 text-white py-2 px-2 border-t border-white hover:bg-black col-span-2"
             >
@@ -1041,7 +1054,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       {!isMobile && (
                         <td className="px-1 w-20">
                           {item.images !==
-                            'https://boretec.com/images/image-coming-soon.png' && (
+                            "https://boretec.com/images/image-coming-soon.png" && (
                             <img
                               className="rounded-md h-12"
                               src={item.images}
@@ -1055,8 +1068,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       {!isMobile && <td>{item.weight} lbs</td>}
                       <td className="px-1">
                         $
-                        {new Intl.NumberFormat('en-US', {
-                          style: 'decimal',
+                        {new Intl.NumberFormat("en-US", {
+                          style: "decimal",
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(item.retailPrice)}
@@ -1064,8 +1077,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                       {!isMobile && (
                         <td className="px-1">
                           $
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'decimal',
+                          {new Intl.NumberFormat("en-US", {
+                            style: "decimal",
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           }).format(item.retailPrice * item.quantity)}
@@ -1132,7 +1145,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                   <option value="other">Other</option>
                 </select>
               </div>
-              {shippingMethod !== 'pickUp' && (
+              {shippingMethod !== "pickUp" && (
                 <div>
                   <div>
                     <b>Tracking Numbers</b>
@@ -1173,7 +1186,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                   </div>
                 </div>
               )}
-              {shippingMethod !== 'pickUp' && (
+              {shippingMethod !== "pickUp" && (
                 <div>
                   <div>
                     <b>Shipping Cost</b>
@@ -1186,24 +1199,25 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                     }
                     className="p-1 bg-gray-100 rounded-lg w-full text-center mt-1"
                   />
-                  <p className="text-sm text-gray-500 text-right">Total of available weights: {calculateTotalWeight()} lbs</p>
+                  <p className="text-sm text-gray-500 text-right">
+                    Total of available weights: {calculateTotalWeight()} lbs
+                  </p>
                 </div>
               )}
-             
+
+              <div>
                 <div>
-                  <div>
-                    <b>Estimated Ship Date</b>
-                  </div>
-                  <DatePicker
-                    selected={shipDate}
-                    onChange={setShipDate}
-                    dateFormat="MM-dd-yy" // Customize the date format
-                    className={`p-1 bg-gray-100 rounded-lg w-full text-center mt-1`} // Apply Tailwind or custom styling here
-                    // Wrapper class for additional styling
-                    //popperPlacement="top-end" // Customize the popper placement
-                  />
+                  <b>Estimated Ship Date</b>
                 </div>
-          
+                <DatePicker
+                  selected={shipDate}
+                  onChange={setShipDate}
+                  dateFormat="MM-dd-yy" // Customize the date format
+                  className={`p-1 bg-gray-100 rounded-lg w-full text-center mt-1`} // Apply Tailwind or custom styling here
+                  // Wrapper class for additional styling
+                  //popperPlacement="top-end" // Customize the popper placement
+                />
+              </div>
             </div>
           </div>
           <div className="bg-gray-100 text-gray-600 text-center border-b border-t border-gray-200 px-2 py-1 w-full">
@@ -1259,7 +1273,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
                   </label>
                   <select
                     value={ccPayment.toString()}
-                    onChange={(e) => setCCpayment(e.target.value === 'true')}
+                    onChange={(e) => setCCpayment(e.target.value === "true")}
                     className="border border-gray-300 rounded-lg px-2 py-1"
                   >
                     <option value="false">No</option>
@@ -1271,8 +1285,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
             <div className="text-right">
               <div className="my-2">
                 Subtotal: $
-                {new Intl.NumberFormat('en-US', {
-                  style: 'decimal',
+                {new Intl.NumberFormat("en-US", {
+                  style: "decimal",
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 }).format(calculateSubTotal())}
@@ -1281,8 +1295,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
               <div className="mt-2">
                 <p>
                   Discount: -$
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'decimal',
+                  {new Intl.NumberFormat("en-US", {
+                    style: "decimal",
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   }).format((calculateSubTotal() * discount) / 100)}
@@ -1291,8 +1305,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
               <div className="mt-2">
                 <p>
                   Tax: $
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'decimal',
+                  {new Intl.NumberFormat("en-US", {
+                    style: "decimal",
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   }).format(calculateTax())}
@@ -1301,8 +1315,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
               <div className="mt-2">
                 <p>
                   Shipping and Handling: $
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'decimal',
+                  {new Intl.NumberFormat("en-US", {
+                    style: "decimal",
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   }).format(shippingCost * 1.15 || 0)}
@@ -1311,8 +1325,8 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
               <div className="mt-2 font-bold">
                 <p>
                   Total Cost: $ $
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'decimal',
+                  {new Intl.NumberFormat("en-US", {
+                    style: "decimal",
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   }).format(
@@ -1365,13 +1379,13 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
               onClick={handleSend}
               className={`bg-gray-800 w-full hover:bg-black text-white font-bold py-2`}
             >
-              {isSaving ? 'Sending...' : 'Save and Send'}
+              {isSaving ? "Sending..." : "Save and Send"}
             </button>
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default EstimateCardAdd
+export default EstimateCardAdd;

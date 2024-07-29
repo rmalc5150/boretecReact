@@ -6,7 +6,7 @@ import { lambdaClient } from '../../lib/amazon'
 import PartCard from '../../components/cards/PartCard'
 import Cookies from 'js-cookie'
 import { CustomerCard } from '../modals/customersSearch'
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 //import { url } from 'inspector'
 
 interface InventoryItem {
@@ -77,7 +77,7 @@ const PartsCards = () => {
   )
   const [isMobile, setIsMobile] = useState(false)
   const [numberOfCustomerSearches, setNumberOfCustomerSearches] = useState(0)
-  const navigate = useNavigate();
+  const router = useRouter();
   const [selectValue, setSelectValue] = useState('')
   const [newCustomer, setNewCustomer] = useState({
     mobilePhone: '',
@@ -411,7 +411,7 @@ const PartsCards = () => {
         }
       })
 
-      navigate('/parts')
+      router.push('/parts')
     }
   }, [visibleItemCount])
 
@@ -689,7 +689,7 @@ qboID,
   return (
     <section className="mt-5">
       <div
-        className={`bg-gray-50 py-1 overflow-y-auto ${
+        className={`bg-gray-100 py-1 overflow-y-auto ${
           requestingEstimate ? '' : 'sticky top-0 max-h-[50vh]'
         }`}
         ref={scrollRef}

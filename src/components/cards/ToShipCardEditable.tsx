@@ -472,7 +472,7 @@ const ToShipCardEditable: React.FC<ToShipCardEditableProps> = ({
             <p className="">{shipAddressCity}, {shipAddressState} {shipAddressPostalCode}</p>
      
             <p className="">{formatPhoneNumber(customerPhone)}</p>
-            {billEmail.split(',').length > 1 ? <p className="">{billEmail.replace(","," ").toLowerCase()}</p> : <p>{billEmail.toLowerCase()}</p>}
+            {billEmail && billEmail.split(',').length > 1 ? <p className="">{billEmail.replace(","," ").toLowerCase()}</p> : <p>{billEmail.toLowerCase()}</p>}
             </a>
           </div>
           <div className="p-2 text-gray-700 text-center">

@@ -5,7 +5,7 @@ import InventorySearch, { InventoryItem } from "../modals/inventorySearch";
 import CustomerSearch, { CustomerCard } from "../modals/customersSearchInvoice";
 import Cookies from "js-cookie";
 import DatePicker from "react-datepicker";
-import {fetchAccessToken } from "../tokenFunctions";
+import { fetchAccessToken } from "../tokenFunctions";
 import { useRouter } from "next/router";
 
 interface EstimateCardAddProps {
@@ -49,7 +49,6 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
   }, [items, message, selectedCustomer, emails]);
 
   useEffect(() => {
-
     // Function to detect if the device is mobile
     const isMobile = () => {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -62,7 +61,6 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
 
   useEffect(() => {
     //fetchAccessToken();
-
   }, [refreshToken]);
 
   const addTracking = (newValue: string) => {
@@ -94,58 +92,84 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
     setIsSaving(true);
     const fetchedAccessToken = await fetchAccessToken();
     if (fetchedAccessToken) {
-    let setTrackingNumbers = JSON.stringify(trackingNumber);
-    if (newTrackingNumber && trackingNumber.length === 0) {
-      setTrackingNumbers = JSON.stringify([newTrackingNumber]);
+      let setTrackingNumbers = JSON.stringify(trackingNumber);
+      if (newTrackingNumber && trackingNumber.length === 0) {
+        setTrackingNumbers = JSON.stringify([newTrackingNumber]);
+      }
+      if (
+        trackingNumber.length === 0 &&
+        shippingMethod !== "pickUp" &&
+        !newTrackingNumber
+      ) {
+        alert("Add a tracking number.");
+        return;
+      }
+
+      const payload = {
+        items,
+        selectedCustomer,
+        tax: calculateTax(),
+        subtotal: calculateSubTotal(),
+        total:
+          calculateTax() +
+          calculateSubTotal() -
+          (calculateSubTotal() * discount) / 100 +
+          shippingCost,
+        shippingCost: (shippingCost * 1.15).toFixed(2),
+        shipDate,
+        shippingMethod,
+        trackingNumber: setTrackingNumbers,
+        discount,
+        message,
+        emails,
+        dueDate,
+        dateCreated: new Date(),
+        origin: nameCheck(),
+        ccPayment,
+        purchaseOrder,
+        accessToken: fetchedAccessToken,
+      };
+      //console.log(JSON.stringify(payload));
+      //use same lmabda.
+      const params = {
+        FunctionName: "createAndInsertInvoiceToShipTransaction", //change to qbo lambda.
+        Payload: JSON.stringify(payload),
+      };
+
+      try {
+        const command = new InvokeCommand(params);
+
+        const response = await lambdaClient.send(command);
+
+        //console.log('Lambda response:', response);
+
+        // Parse the Payload to get the application-level response
+        const applicationResponse = JSON.parse(
+          new TextDecoder().decode(response.Payload)
+        );
+
+        //console.log('Application response:', applicationResponse);
+        //const responseBody = JSON.parse(applicationResponse.body)
+
+        if (applicationResponse.statusCode === 200) {
+          //console.log('Item added successfully.');
+          onClose();
+        } else {
+          setIsSaving(false);
+          alert("Failed to process invoice: " + applicationResponse);
+        }
+      } catch (error) {
+        alert("Failed to add or send the invoice. " + error);
+        console.error("Error invoking Lambda function:", error);
+      }
+    } else {
+      setIsSaving(false);
+      alert("We need to login to Quickbooks to refresh the credentials.");
+      router.push(
+        "https://appcenter.intuit.com/connect/oauth2?client_id=ABIgT9WGOJyDM8vD1lGo4inh4gZE43LxBufFIpDCeZkQ8KbiLd&redirect_uri=http://inventory.boretec.com/api/callback&response_type=code&scope=com.intuit.quickbooks.accounting"
+      );
     }
-    if (
-      trackingNumber.length === 0 &&
-      shippingMethod !== "pickUp" &&
-      !newTrackingNumber
-    ) {
-      alert("Add a tracking number.");
-      return;
-    }
-    
-    const payload = {
-      items,
-      selectedCustomer,
-      tax: calculateTax(),
-      subtotal: calculateSubTotal(),
-      total:
-        calculateTax() +
-        calculateSubTotal() -
-        (calculateSubTotal() * discount) / 100 +
-        shippingCost,
-      shippingCost: (shippingCost * 1.15).toFixed(2),
-      shipDate,
-      shippingMethod,
-      trackingNumber: setTrackingNumbers,
-      discount,
-      message,
-      emails,
-      dueDate,
-      dateCreated: new Date(),
-      origin: nameCheck(),
-      ccPayment,
-      purchaseOrder,
-    };
-
-//use same lmabda. 
-
-    
-    setIsSaving(false);
-
-  } else {
-    setIsSaving(false);
-    alert('We need to login to Quickbooks to refresh the credentials.')
-    router.push('https://appcenter.intuit.com/connect/oauth2?client_id=ABIgT9WGOJyDM8vD1lGo4inh4gZE43LxBufFIpDCeZkQ8KbiLd&redirect_uri=http://inventory.boretec.com/api/callback&response_type=code&scope=com.intuit.quickbooks.accounting');
-  }
   };
-
-
-
-
 
   const handleCustomerClick = (customer: CustomerCard) => {
     setSelectedCustomer(customer);
@@ -240,8 +264,6 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
       throw new Error("Error invoking Lambda function");
     }
   };
-
-
 
   const saveCustomerDetails = async () => {
     if (
@@ -396,12 +418,9 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
     });
   };
 
-
-
   return (
     <div className="bg-white lg:text-sm">
       <div className="grid md:grid-cols-3">
-
         <button
           className="text-lg text-center font-medium px-4 py-1 text-white bg-indigo-500"
           onClick={() => {

@@ -12,7 +12,7 @@ const Parts = () => {
     };
   return (
     
-      <div className="w-full h-screen bg-gray-50">
+      <div className="w-full h-screen bg-gray-100">
 
 <nav className="bg-white p-2 md:mx-2 md:my-2 md:rounded-xl md:border md:border-gray-100">
     <div className="mx-auto px-4">

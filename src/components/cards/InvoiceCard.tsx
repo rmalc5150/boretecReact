@@ -273,13 +273,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
   const today = new Date();
   const dueDateComparable = new Date(dueDate);
 
-  let clickTimeComparable = null;
 
-  if (clickTime) {
-    clickTimeComparable = new Date(clickTime);
-  } else {
-    clickTimeComparable = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  }
 
   return (
     <div className="bg-white my-4 rounded-lg overflow-hidden">
@@ -335,7 +329,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
       {invoiceStatus !== "Paid" &&
         !clickTime &&
         deliveredTime &&
-        clickTimeComparable > today && (
+        (
           <div className="bg-violet-500 text-white text-center p-1 border-t border-white">
             <p className="text-center">Unviewed</p>
           </div>
@@ -502,7 +496,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
                         style: "decimal",
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      }).format(details.lineAmount)}
+                      }).format((details.quantity*details.unitPrice))}
                     </td>
                   )}
                 </tr>
@@ -654,8 +648,8 @@ const InvoiceCard: React.FC<invoiceCards> = ({
 
                 <p>{billAddressLine1}</p>
                 {billAddressLine2 && <p>{billAddressLine2}</p>}
-                <p>{billAddressLine3}</p>
-                <p>{billAddressLine4}</p>
+                {billAddressLine3 ? <p>{billAddressLine3}</p> : <p>{billAddressCity}, {billAddressState} {billAddressPostalCode}</p>}
+                {billAddressLine4 ? <p>{billAddressLine4}</p> : <p>{billAddressCountry}</p>}
               </div>
             </div>
             <div className="pb-2 py-1 px-2">
@@ -722,11 +716,12 @@ const InvoiceCard: React.FC<invoiceCards> = ({
           </div>
         )}
 
-        <a href={pdf}>
+        {pdf && <a href={pdf}>
           <div className="md:border-r border-b md:border-b-0 border-gray-50 py-1">
             <div className="text-center cursor-pointer">Download PDF</div>
           </div>
-        </a>
+        </a>}
+        <div className={`${!pdf && 'col-span-2'}`}>
         {customerPhone ? (
           <a href={`tel:${customerPhone}`} style={{ textDecoration: "none" }}>
             <div className="py-1">Call</div>
@@ -734,6 +729,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
         ) : (
           <div className="py-1">No phone on file</div>
         )}
+        </div>
       </div>
     </div>
   );
