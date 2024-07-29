@@ -148,15 +148,14 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
           new TextDecoder().decode(response.Payload)
         );
 
-        //console.log('Application response:', applicationResponse);
-        //const responseBody = JSON.parse(applicationResponse.body)
+        const stringifiedApplicationResponse = JSON.stringify(applicationResponse);
 
         if (applicationResponse.statusCode === 200) {
           //console.log('Item added successfully.');
           onClose();
         } else {
           setIsSaving(false);
-          alert("Failed to process invoice: " + applicationResponse);
+          alert("Failed to process invoice: " + stringifiedApplicationResponse);
         }
       } catch (error) {
         alert("Failed to add or send the invoice. " + error);

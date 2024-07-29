@@ -253,7 +253,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({
         accessToken: fetchedAccessToken
       };
 
-      console.log(JSON.stringify(payload));
+      //console.log(JSON.stringify(payload));
 
       const params = {
         FunctionName: "createAndInsertInvoiceToShipTransaction", //change to qbo lambda.
