@@ -12,7 +12,6 @@ interface Measurements {
   manufacturedLeg1: number | null;
   manufacturedLeg2: number | null;
   rawMaterialType: string | null;
-  supplierUnit: string | null;
   unit: string | null;
   convertedItemNumber: number | null;
   length: number | null;
@@ -44,7 +43,6 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
   const [manufacturedLeg1, setManufacturedLeg1] = useState<number | null>(null);
   const [manufacturedLeg2, setManufacturedLeg2] = useState<number | null>(null);
   const [rawMaterialType, setRawMaterialType] = useState<string>("rectangular plate");
-  const [supplierUnit, setSupplierUnit] = useState<string>("in");
   const [unit, setUnit] = useState<string>("in");
   const [convertedItemNumber, setConvertedItemNumber] = useState<number | null>(null);
   const [manufacturedCalculatedWeight, setManufacturedCalculatedWeight] = useState<number | null>(null);
@@ -69,7 +67,6 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
       setManufacturedLeg1(measurementsJSON.manufacturedLeg1 ?? null);
       setManufacturedLeg2(measurementsJSON.manufacturedLeg2 ?? null);
       setRawMaterialType(measurementsJSON.rawMaterialType ?? "rectangular plate");
-      setSupplierUnit(measurementsJSON.supplierUnit ?? "in");
       setUnit(measurementsJSON.unit ?? "in");
       setConvertedItemNumber(measurementsJSON.convertedItemNumber ?? null);
     }
@@ -131,25 +128,37 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
       }
     };
   
-    const supplierLength = convertToInches(length, supplierUnit);
-    const supplierWidth = convertToInches(width, supplierUnit);
-    const supplierThickness = convertToInches(thickness, supplierUnit);
-    const supplierDiameter = convertToInches(diameter, supplierUnit);
-    const supplierLeg1 = convertToInches(leg1, supplierUnit);
-    const supplierLeg2 = convertToInches(leg2, supplierUnit);
+    let supplierLength = length;
+    let supplierWidth = width;
+    let supplierDiameter = diameter;
+    let supplierLeg1 = leg1;
+    let supplierLeg2 = leg2;
+    let manufacturedLengthInches = manufacturedLength;
+    let manufacturedWidthInches = manufacturedWidth;
+    let thicknessInches = thickness;
+    let manufacturedDiameterInches = manufacturedDiameter;
+    let manufacturedLeg1Inches = manufacturedLeg1;
+    let manufacturedLeg2Inches = manufacturedLeg2;
   
-    const manufacturedLengthInches = convertToInches(manufacturedLength, unit);
-    const manufacturedWidthInches = convertToInches(manufacturedWidth, unit);
-    const thicknessInches = convertToInches(thickness, unit);
-    const manufacturedDiameterInches = convertToInches(manufacturedDiameter, unit);
-    const manufacturedLeg1Inches = convertToInches(manufacturedLeg1, unit);
-    const manufacturedLeg2Inches = convertToInches(manufacturedLeg2, unit);
+    if (unit !== 'in') {
+      supplierLength = convertToInches(length, unit);
+      supplierWidth = convertToInches(width, unit);
+      supplierDiameter = convertToInches(diameter, unit);
+      supplierLeg1 = convertToInches(leg1, unit);
+      supplierLeg2 = convertToInches(leg2, unit);
+      manufacturedLengthInches = convertToInches(manufacturedLength, unit);
+      manufacturedWidthInches = convertToInches(manufacturedWidth, unit);
+      thicknessInches = convertToInches(thickness, unit);
+      manufacturedDiameterInches = convertToInches(manufacturedDiameter, unit);
+      manufacturedLeg1Inches = convertToInches(manufacturedLeg1, unit);
+      manufacturedLeg2Inches = convertToInches(manufacturedLeg2, unit);
+    }
   
     let supplierVolume = calculateVolume(
       rawMaterialType,
       supplierLength,
       supplierWidth,
-      supplierThickness,
+      thicknessInches,
       supplierDiameter,
       supplierLeg1,
       supplierLeg2
@@ -166,7 +175,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
     );
   
     // Convert volumes to cubic inches if needed
-    supplierVolume = convertToCubicInches(supplierVolume, supplierUnit);
+    supplierVolume = convertToCubicInches(supplierVolume, unit);
     manufacturedVolume = convertToCubicInches(manufacturedVolume, unit);
   
     if (supplierVolume && manufacturedVolume) {
@@ -188,11 +197,9 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
     leg2,
     manufacturedLength,
     manufacturedWidth,
-    thickness,
     manufacturedDiameter,
     manufacturedLeg1,
     manufacturedLeg2,
-    supplierUnit,
     unit,
   ]);
 
@@ -490,15 +497,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{length} {supplierUnit}</p>
+                <p>{length} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{width} {supplierUnit}</p>
+                <p>{width} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness} {supplierUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
@@ -506,15 +513,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Diameter</p>
-                <p>{diameter} {supplierUnit}</p>
+                <p>{diameter} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{length} {supplierUnit}</p>
+                <p>{length} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness} {supplierUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
@@ -522,19 +529,19 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{length} {supplierUnit}</p>
+                <p>{length} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{width} {supplierUnit}</p>
+                <p>{width} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Height</p>
-                <p>{height} {supplierUnit}</p>
+                <p>{height} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness} {supplierUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
@@ -542,19 +549,19 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Leg1</p>
-                <p>{leg1} {supplierUnit}</p>
+                <p>{leg1} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Leg2</p>
-                <p>{leg2} {supplierUnit}</p>
+                <p>{leg2} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{length} {supplierUnit}</p>
+                <p>{length} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{thickness} {supplierUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
