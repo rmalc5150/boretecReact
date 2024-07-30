@@ -92,12 +92,12 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
           return length && width && thickness ? length * width * thickness : null;
         case "round tubing":
           return diameter && thickness && length
-            ? Math.PI * Math.pow(diameter / 2, 2) * length * thickness
+            ? Math.PI * diameter * length * thickness
             : null;
         case "rectangular tubing":
           return length && width && thickness ? (2 * length + 2 * width) * thickness : null;
         case "angle iron":
-          return leg1 && leg2 && thickness ? leg1 * thickness + leg2 * thickness : null;
+          return leg1 && leg2 && thickness && length ? (leg1 * length + leg2 * length) * thickness : null;
         default:
           return null;
       }
@@ -485,7 +485,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
         <p className="py-1 bg-gray-100 rounded-md">
           Supplier measurements
         </p>
-        <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-3" : rawMaterialType === "angle iron" ? "grid-cols-3" : "grid-cols-2"}`}>
+        <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "angle iron" ? "grid-cols-4" : "grid-cols-3"}`}>
           {rawMaterialType === "rectangular plate" && (
             <>
               <div className="border-r p-2">
@@ -563,7 +563,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
         <p className="text-center py-1 bg-gray-100 rounded-md">
           Boretec measurements
         </p>
-        <div className={`grid ${rawMaterialType === "rectangular plate" || rawMaterialType === "rectangular tubing" ? "grid-cols-3" : rawMaterialType === "round tubing" ? "grid-cols-3" : "grid-cols-3"}`}>
+        <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "angle iron" ? "grid-cols-4" : "grid-cols-3"}`}>
           {rawMaterialType === "rectangular plate" && (
             <>
               <div className="border-r p-2">
