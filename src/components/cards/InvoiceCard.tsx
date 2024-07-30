@@ -643,6 +643,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
                     <span className="font-medium">Mobile:</span> {mobilePhone}
                   </p>
                 )}
+
               </div>
               <div className="pt-2">
                 <p className="font-medium">Shipping Address:</p>
@@ -673,12 +674,17 @@ const InvoiceCard: React.FC<invoiceCards> = ({
                 )}
               </div>
             </div>
-            <div className="pb-2 py-1 px-2">
+            <div className="pb-2 py-1 px-2 w-full">
               {message && (
                 <p>
                   <span className="font-medium">Message:</span> {message}
                 </p>
               )}
+              {qboUrl && (
+                  <div className="w-full">
+                    <a href={qboUrl} target="_blank" rel="noopener noreferrer" className="block w-full text-center font-medium py-1 px-2 bg-gray-200 rounded-lg">Invoice link</a>
+                  </div>
+                )}
             </div>
           </div>
         )}
