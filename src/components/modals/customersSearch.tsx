@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { InvokeCommand, type InvokeCommandInput } from '@aws-sdk/client-lambda'
 import { lambdaClient } from '../../lib/amazon'
 import AddCustomer from '../cards/AddCustomer'
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 
 export interface CustomerCard {
   mobilePhone: string
@@ -46,7 +46,7 @@ const Customers: React.FC<CustomersProps> = ({ onRowClick, isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate();
+  const router = useRouter();
 
 
   useEffect(() => {

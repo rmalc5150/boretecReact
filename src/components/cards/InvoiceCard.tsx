@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import CompanyLogo from "../ui/companyLogo";
 import EmailEventSearch from "../buttons/EmailEventSearch";
+import ResendLink from "../buttons/ResendLink"
 
 //db fields
 export interface invoiceCards {
@@ -129,6 +130,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
   const [showDetails, setShowDetails] = useState(false);
   const [showEmailEvents, setShowEmailEvents] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showResendLink, setShowResendLink] = useState(false);
   const [trackingNumberArray, setTrackingNumberArray] = useState<
     string[] | null
   >(null);
@@ -278,7 +280,9 @@ const InvoiceCard: React.FC<invoiceCards> = ({
   const dueDateComparable = new Date(dueDate);
 
   return (
-    <div className="bg-white my-4 rounded-lg overflow-hidden">
+    <div>
+    {showResendLink ? (<ResendLink emails={billEmail} link={qboUrl} invoiceNumber={invoiceNumber} onHide = {()=>setShowResendLink(false)}/>) : 
+    (<div className="bg-white my-4 rounded-lg overflow-hidden">
       {invoiceStatus !== "Paid" && dueDateComparable > today && (
         <div className="bg-indigo-500 text-white text-center p-1">
           <div className="grid grid-cols-3">
@@ -739,7 +743,8 @@ const InvoiceCard: React.FC<invoiceCards> = ({
         {qboUrl && (
           <div
             className="md:border-r border-b md:border-b-0 border-gray-50 py-1 cursor-pointer"
-            onClick={composeEmail}
+            //onClick={composeEmail}
+            onClick={()=>setShowResendLink(true)}
           >
             Resend Link
           </div>
@@ -762,6 +767,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
           )}
         </div>
       </div>
+    </div>)}
     </div>
   );
 };
