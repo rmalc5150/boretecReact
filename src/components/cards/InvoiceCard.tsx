@@ -330,7 +330,12 @@ const InvoiceCard: React.FC<invoiceCards> = ({
       )}
       {invoiceStatus !== "Paid" && !clickTime && deliveredTime && (
         <div className="bg-violet-500 text-white text-center p-1 border-t border-white">
-          <p className="text-center">Unviewed</p>
+          <p className="text-center">Unclicked</p>
+        </div>
+      )}
+      {invoiceStatus !== "Paid" && emailId && !deliveredTime && (
+        <div className="bg-violet-500 text-white text-center p-1 border-t border-white">
+          <p className="text-center">Undelivered</p>
         </div>
       )}
       <div className="border-r border-l border-gray-200">

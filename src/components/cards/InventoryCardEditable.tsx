@@ -429,11 +429,7 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
         const weightValue = parent.querySelector(".weight")?.textContent || "";
         if (!isNaN(parseFloat(weightValue))) {
           setWeight(parseFloat(weightValue));
-        } else {
-          alert("Weight must be a number.");
-          setShowSaving(false);
-          return;
-        }
+        } 
 
         const parLevelValue =
           parent.querySelector(".parLevel")?.textContent || "";

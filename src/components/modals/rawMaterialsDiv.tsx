@@ -8,13 +8,12 @@ interface Measurements {
   manufacturedLength: number | null;
   manufacturedWidth: number | null;
   manufacturedHeight: number | null;
-  manufacturedThickness: number | null;
   manufacturedDiameter: number | null;
   manufacturedLeg1: number | null;
   manufacturedLeg2: number | null;
   rawMaterialType: string | null;
   supplierUnit: string | null;
-  manufacturedUnit: string | null;
+  unit: string | null;
   convertedItemNumber: number | null;
   length: number | null;
   width: number | null;
@@ -41,13 +40,12 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
   const [manufacturedLength, setManufacturedLength] = useState<number | null>(null);
   const [manufacturedWidth, setManufacturedWidth] = useState<number | null>(null);
   const [manufacturedHeight, setManufacturedHeight] = useState<number | null>(null);
-  const [manufacturedThickness, setManufacturedThickness] = useState<number | null>(null);
   const [manufacturedDiameter, setManufacturedDiameter] = useState<number | null>(null);
   const [manufacturedLeg1, setManufacturedLeg1] = useState<number | null>(null);
   const [manufacturedLeg2, setManufacturedLeg2] = useState<number | null>(null);
   const [rawMaterialType, setRawMaterialType] = useState<string>("rectangular plate");
   const [supplierUnit, setSupplierUnit] = useState<string>("in");
-  const [manufacturedUnit, setManufacturedUnit] = useState<string>("in");
+  const [unit, setUnit] = useState<string>("in");
   const [convertedItemNumber, setConvertedItemNumber] = useState<number | null>(null);
   const [manufacturedCalculatedWeight, setManufacturedCalculatedWeight] = useState<number | null>(null);
   const [calculatedWeight, setCalculatedWeight] = useState<number | null>(null);
@@ -66,13 +64,13 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
       setManufacturedLength(measurementsJSON.manufacturedLength ?? null);
       setManufacturedWidth(measurementsJSON.manufacturedWidth ?? null);
       setManufacturedHeight(measurementsJSON.manufacturedHeight ?? null);
-      setManufacturedThickness(measurementsJSON.manufacturedThickness ?? null);
+
       setManufacturedDiameter(measurementsJSON.manufacturedDiameter ?? null);
       setManufacturedLeg1(measurementsJSON.manufacturedLeg1 ?? null);
       setManufacturedLeg2(measurementsJSON.manufacturedLeg2 ?? null);
       setRawMaterialType(measurementsJSON.rawMaterialType ?? "rectangular plate");
       setSupplierUnit(measurementsJSON.supplierUnit ?? "in");
-      setManufacturedUnit(measurementsJSON.manufacturedUnit ?? "in");
+      setUnit(measurementsJSON.unit ?? "in");
       setConvertedItemNumber(measurementsJSON.convertedItemNumber ?? null);
     }
   }, [measurements]);
@@ -140,12 +138,12 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
     const supplierLeg1 = convertToInches(leg1, supplierUnit);
     const supplierLeg2 = convertToInches(leg2, supplierUnit);
   
-    const manufacturedLengthInches = convertToInches(manufacturedLength, manufacturedUnit);
-    const manufacturedWidthInches = convertToInches(manufacturedWidth, manufacturedUnit);
-    const manufacturedThicknessInches = convertToInches(manufacturedThickness, manufacturedUnit);
-    const manufacturedDiameterInches = convertToInches(manufacturedDiameter, manufacturedUnit);
-    const manufacturedLeg1Inches = convertToInches(manufacturedLeg1, manufacturedUnit);
-    const manufacturedLeg2Inches = convertToInches(manufacturedLeg2, manufacturedUnit);
+    const manufacturedLengthInches = convertToInches(manufacturedLength, unit);
+    const manufacturedWidthInches = convertToInches(manufacturedWidth, unit);
+    const thicknessInches = convertToInches(thickness, unit);
+    const manufacturedDiameterInches = convertToInches(manufacturedDiameter, unit);
+    const manufacturedLeg1Inches = convertToInches(manufacturedLeg1, unit);
+    const manufacturedLeg2Inches = convertToInches(manufacturedLeg2, unit);
   
     let supplierVolume = calculateVolume(
       rawMaterialType,
@@ -161,7 +159,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
       rawMaterialType,
       manufacturedLengthInches,
       manufacturedWidthInches,
-      manufacturedThicknessInches,
+      thicknessInches,
       manufacturedDiameterInches,
       manufacturedLeg1Inches,
       manufacturedLeg2Inches
@@ -169,7 +167,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
   
     // Convert volumes to cubic inches if needed
     supplierVolume = convertToCubicInches(supplierVolume, supplierUnit);
-    manufacturedVolume = convertToCubicInches(manufacturedVolume, manufacturedUnit);
+    manufacturedVolume = convertToCubicInches(manufacturedVolume, unit);
   
     if (supplierVolume && manufacturedVolume) {
       setConvertedItemNumber(supplierVolume / manufacturedVolume);
@@ -190,12 +188,12 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
     leg2,
     manufacturedLength,
     manufacturedWidth,
-    manufacturedThickness,
+    thickness,
     manufacturedDiameter,
     manufacturedLeg1,
     manufacturedLeg2,
     supplierUnit,
-    manufacturedUnit,
+    unit,
   ]);
 
 
@@ -216,11 +214,31 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <option value="rectangular tubing">Rectangular Tubing</option>
             <option value="angle iron">Angle Iron</option>
           </select>
-  
+          <div className="mb-4">
+          <div className="p-2 text-center font-bold">
+                  Thickness
+                  <input
+                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
+                    type="number"
+                    value={thickness !== null ? thickness.toString() : ""}
+                    onChange={(e) => setThickness(e.target.value ? parseFloat(e.target.value) : null)}
+                  />
+                </div>
+                <select
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            className="text-center outline-none font-bold focus:outline-none focus:ring-0 w-full"
+          >
+            <option value="in">all values measured in inches (in)</option>
+            <option value="ft">all values measured in feet (ft)</option>
+            <option value="cm">all values measured in centimeters (cm)</option>
+            <option value="m">all values measured in meters (m)</option>
+          </select>
+            </div>
           <p className="text-center py-1 bg-gray-100 rounded-md">
             Supplier measurements
           </p>
-          <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "round tubing" ? "grid-cols-3" : "grid-cols-3"}`}>
+          <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-3" : rawMaterialType === "angle iron" ? "grid-cols-3" : "grid-cols-2"}`}>
             {rawMaterialType === "rectangular plate" && (
               <>
                 <div className="p-2 text-center font-bold">
@@ -241,15 +259,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                     onChange={(e) => setWidth(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
-                <div className="p-2 text-center font-bold">
-                  Thickness
-                  <input
-                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
-                    type="number"
-                    value={thickness !== null ? thickness.toString() : ""}
-                    onChange={(e) => setThickness(e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                </div>
+
               </>
             )}
             {rawMaterialType === "round tubing" && (
@@ -272,15 +282,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                     onChange={(e) => setLength(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
-                <div className="p-2 text-center font-bold">
-                  Thickness
-                  <input
-                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
-                    type="number"
-                    value={thickness !== null ? thickness.toString() : ""}
-                    onChange={(e) => setThickness(e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                </div>
+
               </>
             )}
             {rawMaterialType === "rectangular tubing" && (
@@ -312,15 +314,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                     onChange={(e) => setHeight(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
-                <div className="p-2 text-center font-bold">
-                  Thickness
-                  <input
-                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
-                    type="number"
-                    value={thickness !== null ? thickness.toString() : ""}
-                    onChange={(e) => setThickness(e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                </div>
+
               </>
             )}
             {rawMaterialType === "angle iron" && (
@@ -344,12 +338,12 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                   />
                 </div>
                 <div className="p-2 text-center font-bold">
-                  Thickness
+                  Length
                   <input
                     className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
                     type="number"
-                    value={thickness !== null ? thickness.toString() : ""}
-                    onChange={(e) => setThickness(e.target.value ? parseFloat(e.target.value) : null)}
+                    value={length !== null ? length.toString() : ""}
+                    onChange={(e) => setLength(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
               </>
@@ -360,22 +354,13 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <p className="px-2 text-sm text-nowrap">
               calculated weight:{" "}{calculatedWeight?.toFixed(2)} lbs.
             </p>
-            <select
-              value={supplierUnit}
-              onChange={(e) => setSupplierUnit(e.target.value)}
-              className="text-right outline-none font-bold focus:outline-none focus:ring-0 w-full"
-            >
-              <option value="in">measured in inches (in)</option>
-              <option value="ft">measured in feet (ft)</option>
-              <option value="cm">measured in centimeters (cm)</option>
-              <option value="m">measured in meters (m)</option>
-            </select>
+
           </div>
   
           <p className="text-center py-1 bg-gray-100 rounded-md">
             Boretec measurements
           </p>
-          <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "round tubing" ? "grid-cols-3" : "grid-cols-3"}`}>
+          <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-3" : rawMaterialType === "angle iron" ? "grid-cols-3" : "grid-cols-2"}`}>
             {rawMaterialType === "rectangular plate" && (
               <>
                 <div className="p-2 text-center font-bold">
@@ -396,15 +381,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                     onChange={(e) => setManufacturedWidth(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
-                <div className="p-2 text-center font-bold">
-                  Thickness
-                  <input
-                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
-                    type="number"
-                    value={manufacturedThickness !== null ? manufacturedThickness.toString() : ""}
-                    onChange={(e) => setManufacturedThickness(e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                </div>
+
               </>
             )}
             {rawMaterialType === "round tubing" && (
@@ -427,15 +404,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                     onChange={(e) => setManufacturedLength(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
-                <div className="p-2 text-center font-bold">
-                  Thickness
-                  <input
-                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
-                    type="number"
-                    value={manufacturedThickness !== null ? manufacturedThickness.toString() : ""}
-                    onChange={(e) => setManufacturedThickness(e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                </div>
+
               </>
             )}
             {rawMaterialType === "rectangular tubing" && (
@@ -467,15 +436,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                     onChange={(e) => setManufacturedHeight(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
-                <div className="p-2 text-center font-bold">
-                  Thickness
-                  <input
-                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
-                    type="number"
-                    value={manufacturedThickness !== null ? manufacturedThickness.toString() : ""}
-                    onChange={(e) => setManufacturedThickness(e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                </div>
+
               </>
             )}
             {rawMaterialType === "angle iron" && (
@@ -499,12 +460,12 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                   />
                 </div>
                 <div className="p-2 text-center font-bold">
-                  Thickness
+                  Length
                   <input
                     className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
                     type="number"
-                    value={manufacturedThickness !== null ? manufacturedThickness.toString() : ""}
-                    onChange={(e) => setManufacturedThickness(e.target.value ? parseFloat(e.target.value) : null)}
+                    value={manufacturedLength !== null ? manufacturedLength.toString() : ""}
+                    onChange={(e) => setManufacturedLength(e.target.value ? parseFloat(e.target.value) : null)}
                   />
                 </div>
               </>
@@ -515,16 +476,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
           <p className="px-2 text-sm text-nowrap">
             calculated weight:{" "}{manufacturedCalculatedWeight?.toFixed(2)} lbs.
           </p>
-          <select
-            value={manufacturedUnit}
-            onChange={(e) => setManufacturedUnit(e.target.value)}
-            className="text-right outline-none font-bold focus:outline-none focus:ring-0 w-full"
-          >
-            <option value="in">measured in inches (in)</option>
-            <option value="ft">measured in feet (ft)</option>
-            <option value="cm">measured in centimeters (cm)</option>
-            <option value="m">measured in meters (m)</option>
-          </select>
+
         </div>
         
       </div>
@@ -533,7 +485,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
         <p className="py-1 bg-gray-100 rounded-md">
           Supplier measurements
         </p>
-        <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "round tubing" ? "grid-cols-3" : "grid-cols-3"}`}>
+        <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-3" : rawMaterialType === "angle iron" ? "grid-cols-3" : "grid-cols-2"}`}>
           {rawMaterialType === "rectangular plate" && (
             <>
               <div className="border-r p-2">
@@ -596,6 +548,10 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
                 <p className="font-bold">Leg2</p>
                 <p>{leg2} {supplierUnit}</p>
               </div>
+              <div className="border-r p-2">
+                <p className="font-bold">Length</p>
+                <p>{length} {supplierUnit}</p>
+              </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
                 <p>{thickness} {supplierUnit}</p>
@@ -612,15 +568,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{manufacturedLength} {manufacturedUnit}</p>
+                <p>{manufacturedLength} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{manufacturedWidth} {manufacturedUnit}</p>
+                <p>{manufacturedWidth} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness} {manufacturedUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
@@ -628,15 +584,15 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Diameter</p>
-                <p>{manufacturedDiameter} {manufacturedUnit}</p>
+                <p>{manufacturedDiameter} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{manufacturedLength} {manufacturedUnit}</p>
+                <p>{manufacturedLength} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness} {manufacturedUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
@@ -644,19 +600,19 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Length</p>
-                <p>{manufacturedLength} {manufacturedUnit}</p>
+                <p>{manufacturedLength} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Width</p>
-                <p>{manufacturedWidth} {manufacturedUnit}</p>
+                <p>{manufacturedWidth} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Height</p>
-                <p>{manufacturedHeight} {manufacturedUnit}</p>
+                <p>{manufacturedHeight} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness} {manufacturedUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
@@ -664,15 +620,19 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <>
               <div className="border-r p-2">
                 <p className="font-bold">Leg1</p>
-                <p>{manufacturedLeg1} {manufacturedUnit}</p>
+                <p>{manufacturedLeg1} {unit}</p>
               </div>
               <div className="border-r p-2">
                 <p className="font-bold">Leg2</p>
-                <p>{manufacturedLeg2} {manufacturedUnit}</p>
+                <p>{manufacturedLeg2} {unit}</p>
+              </div>
+                            <div className="border-r p-2">
+                <p className="font-bold">Length</p>
+                <p>{manufacturedLength} {unit}</p>
               </div>
               <div className="p-2">
                 <p className="font-bold">Thickness</p>
-                <p>{manufacturedThickness} {manufacturedUnit}</p>
+                <p>{thickness} {unit}</p>
               </div>
             </>
           )}
