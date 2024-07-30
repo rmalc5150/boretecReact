@@ -281,7 +281,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
 
   return (
     <div>
-    {showResendLink ? (<ResendLink emails={billEmail} link={qboUrl} invoiceNumber={invoiceNumber} onHide = {()=>setShowResendLink(false)}/>) : 
+    {showResendLink ? (<ResendLink displayName={displayName} emails={billEmail} link={qboUrl} invoiceNumber={invoiceNumber} onHide = {()=>setShowResendLink(false)}/>) : 
     (<div className="bg-white my-4 rounded-lg overflow-hidden">
       {invoiceStatus !== "Paid" && dueDateComparable > today && (
         <div className="bg-indigo-500 text-white text-center p-1">
