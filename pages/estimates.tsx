@@ -1,12 +1,19 @@
 // pages/analytics.tsx
 import React from "react";
 import Estimates from "../src/pages/estimates/page";
-//import Login from "../src/pages/login/page";
+import Head from "next/head";
 import { PageProps } from "../src/types/PageProps";
 
 const EstimatesPage = ({ session }: PageProps) => {
     //console.log(session);
-  return <Estimates />;
-};
+    return (
+      <>
+        <Head>
+          <title>Boretec - Estimates</title>
+        </Head>
+        <Estimates /> 
+      </>
+    );
+  };
 
 export default EstimatesPage;
