@@ -92,7 +92,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             ? Math.PI * diameter * length * thickness
             : null;
         case "rectangular tubing":
-          return length && width && thickness ? (2 * length + 2 * width) * thickness : null;
+          return length && width && thickness && height ? (2 * height + 2 * width) * thickness * length : null;
         case "angle iron":
           return leg1 && leg2 && thickness && length ? (leg1 * length + leg2 * length) * thickness : null;
         default:
@@ -220,6 +220,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <option value="round tubing">Round Tubing</option>
             <option value="rectangular tubing">Rectangular Tubing</option>
             <option value="angle iron">Angle Iron</option>
+            <option value="other">Other</option>
           </select>
           <div className="mb-4">
           <div className="p-2 text-center font-bold">
@@ -242,6 +243,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             <option value="m">all values measured in meters (m)</option>
           </select>
             </div>
+      
           <p className="text-center py-1 bg-gray-100 rounded-md">
             Supplier measurements
           </p>
@@ -363,7 +365,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             </p>
 
           </div>
-  
+       
           <p className="text-center py-1 bg-gray-100 rounded-md">
             Boretec measurements
           </p>
@@ -489,6 +491,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
       </div>
     ) : (
       <div className="text-center">
+        {/*
         <p className="py-1 bg-gray-100 rounded-md">
           Supplier measurements
         </p>
@@ -566,7 +569,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
             </>
           )}
         </div>
-
+        */}
         <p className="text-center py-1 bg-gray-100 rounded-md">
           Boretec measurements
         </p>

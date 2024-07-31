@@ -263,18 +263,7 @@ const InvoiceCard: React.FC<invoiceCards> = ({
     }, 0);
   };
 
-  const emailSubject = "Boretec Invoice";
-  const emailBody = `Copy the following link into your browswer to view the invoice for ${companyName} created on ${dateCreated?.slice(
-    0,
-    15
-  )}: ${qboUrl}`;
 
-  const composeEmail = () => {
-    const mailtoLink = `mailto:${billEmail}?subject=${encodeURIComponent(
-      emailSubject
-    )}&body=${encodeURIComponent(emailBody)}`;
-    window.location.href = mailtoLink;
-  };
 
   const today = new Date();
   const dueDateComparable = new Date(dueDate);

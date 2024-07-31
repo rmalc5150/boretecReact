@@ -130,10 +130,21 @@ const ToShip = () => {
   }
 
   function formatQuantitiesAndParts(shipment: ToShipCardEditableProps) {
+    //if (shipment.itemsQuantity && shipment.itemsDetailType) {}
     const quantities = shipment.itemsQuantity.split(",");
     const partNumbers = shipment.itemsDetailType.split(",").map(pn => pn.includes(':') ? pn.split(':')[1] : pn);
     const combined = quantities.map((qty, index) => (
       <p key={index}>({qty.trim()}) {partNumbers[index].trim()}</p>
+    ));
+    return combined;
+  }
+
+  function formatQuantitiesAndPartsItems(shipment: ToShipCardEditableProps) {
+    const invoiceItems = JSON.parse(shipment.invoiceItems);
+    console.log(shipment.invoiceItems);
+  
+    const combined = invoiceItems.map((item: { quantity: number; partNumber: string }, index: number) => (
+      <p key={index}>({item.quantity}) {item.partNumber}</p>
     ));
     return combined;
   }
@@ -197,9 +208,7 @@ const ToShip = () => {
       <th className="border-r py-1 cursor-pointer" onClick={() => sortData('invoiceNumber')}>
         Invoice Number {sortedBy === 'invoiceNumber' && sortDirection === 'desc' && <span className="text-xs text-gray-400">&#9650;</span>} {sortedBy === 'invoiceNumber' && sortDirection === 'asc' && <span className="text-xs text-gray-400">&#9660;</span>}
       </th>
-      {!isMobile && <th className="border-r  py-1 cursor-pointer" onClick={() => sortData('status')}>
-        Invoice Status {sortedBy === 'status' && sortDirection === 'desc' && <span className="text-xs text-gray-400">&#9650;</span>} {sortedBy === 'status' && sortDirection === 'asc' && <span className="text-xs text-gray-400">&#9660;</span>}
-      </th>}
+
       {!isMobile && <th className="border-r  py-1">
         Quantity - Part Number
       </th>}
@@ -214,10 +223,14 @@ const ToShip = () => {
         <td className="border-r border-t">
           {shipment.invoiceNumber}
         </td>
-        {!isMobile &&<td className="border-r border-t">{shipment.status}</td>}
-        {!isMobile &&<td className="border-r border-t">
+
+        {!isMobile && shipment.itemsQuantity ? <td className="border-r border-t">
           {formatQuantitiesAndParts(shipment)}
-        </td>}
+        </td> : 
+         <td className="border-r border-t">
+         {formatQuantitiesAndPartsItems(shipment)}
+       </td>
+        }
         <td className="border-t">{shipment.shipDate}</td>
       </tr>
     ))}
