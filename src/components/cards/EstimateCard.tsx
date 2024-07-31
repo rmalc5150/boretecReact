@@ -483,7 +483,7 @@ const name = nameCheck();
             </p>
             {discount > 1 && (
               <p>
-                {discount}% discount: -$
+                {discount.toFixed(2)}% discount: -$
                 {new Intl.NumberFormat('en-US', {
                   style: 'decimal',
                   minimumFractionDigits: 2,
