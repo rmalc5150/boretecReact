@@ -213,7 +213,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing, up
     };
   
     updateMeasurements(JSON.stringify(updatedMeasurements));
-    updateUnsavedChanges;
+    updateUnsavedChanges();
 
     //console.log(updatedMeasurements);
 
