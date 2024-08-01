@@ -210,6 +210,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing, up
       convertedItemNumber,
       calculatedWeight,
       manufacturedCalculatedWeight,
+      rawMaterialType
     };
   
     updateMeasurements(JSON.stringify(updatedMeasurements));
