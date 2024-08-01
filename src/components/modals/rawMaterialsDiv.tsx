@@ -26,9 +26,11 @@ interface Measurements {
 interface InheritedProps {
   measurements: string;
   isEditing: boolean;
+  updateUnsavedChanges: ()=>void;
+  updateMeasurements: (measurements:string) => void;
 }
 
-const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) => {
+const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing, updateUnsavedChanges, updateMeasurements }) => {
   const [length, setLength] = useState<number | null>(null);
   const [width, setWidth] = useState<number | null>(null);
   const [height, setHeight] = useState<number | null>(null);
@@ -48,29 +50,31 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
   const [manufacturedCalculatedWeight, setManufacturedCalculatedWeight] = useState<number | null>(null);
   const [calculatedWeight, setCalculatedWeight] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (measurements) {
-      const measurementsJSON: Measurements = JSON.parse(measurements);
 
-      setLength(measurementsJSON.length ?? null);
-      setWidth(measurementsJSON.width ?? null);
-      setHeight(measurementsJSON.height ?? null);
-      setThickness(measurementsJSON.thickness ?? null);
-      setDiameter(measurementsJSON.diameter ?? null);
-      setLeg1(measurementsJSON.leg1 ?? null);
-      setLeg2(measurementsJSON.leg2 ?? null);
-      setManufacturedLength(measurementsJSON.manufacturedLength ?? null);
-      setManufacturedWidth(measurementsJSON.manufacturedWidth ?? null);
-      setManufacturedHeight(measurementsJSON.manufacturedHeight ?? null);
-
-      setManufacturedDiameter(measurementsJSON.manufacturedDiameter ?? null);
-      setManufacturedLeg1(measurementsJSON.manufacturedLeg1 ?? null);
-      setManufacturedLeg2(measurementsJSON.manufacturedLeg2 ?? null);
-      setRawMaterialType(measurementsJSON.rawMaterialType ?? "rectangular plate");
-      setUnit(measurementsJSON.unit ?? "in");
-      setConvertedItemNumber(measurementsJSON.convertedItemNumber ?? null);
-    }
-  }, [measurements]);
+    useEffect(() => {
+      console.log(measurements);
+      if (measurements) {
+        const measurementsJSON = JSON.parse(measurements);
+    
+        setLength(measurementsJSON.supplierLength ?? null);
+        setWidth(measurementsJSON.supplierWidth ?? null);
+        setThickness(measurementsJSON.supplierThickness ?? null);
+        setDiameter(measurementsJSON.supplierDiameter ?? null);
+        setLeg1(measurementsJSON.supplierLeg1 ?? null);
+        setLeg2(measurementsJSON.supplierLeg2 ?? null);
+        setManufacturedLength(measurementsJSON.manufacturedLengthInches ?? null);
+        setManufacturedWidth(measurementsJSON.manufacturedWidthInches ?? null);
+        setManufacturedHeight(measurementsJSON.manufacturedThicknessInches ?? null);
+        setManufacturedDiameter(measurementsJSON.manufacturedDiameterInches ?? null);
+        setManufacturedLeg1(measurementsJSON.manufacturedLeg1Inches ?? null);
+        setManufacturedLeg2(measurementsJSON.manufacturedLeg2Inches ?? null);
+        setRawMaterialType(measurementsJSON.rawMaterialType ?? "rectangular plate");
+        setUnit(measurementsJSON.unit ?? "in");
+        setConvertedItemNumber(measurementsJSON.convertedItemNumber ?? null);
+        setCalculatedWeight(measurementsJSON.calculatedWeight ?? null);
+        setManufacturedCalculatedWeight(measurementsJSON.manufacturedCalculatedWeight ?? null);
+      }
+    }, [measurements]);
 
   useEffect(() => {
     const STEEL_DENSITY = 0.2836; // pounds per cubic inch
@@ -187,6 +191,32 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
       setCalculatedWeight(null);
       setManufacturedCalculatedWeight(null);
     }
+
+    const updatedMeasurements = {
+      supplierLength,
+      supplierWidth,
+      supplierThickness: thicknessInches,
+      supplierDiameter,
+      supplierLeg1,
+      supplierLeg2,
+      manufacturedLengthInches,
+      manufacturedWidthInches,
+      manufacturedThicknessInches: thicknessInches,
+      manufacturedDiameterInches,
+      manufacturedLeg1Inches,
+      manufacturedLeg2Inches,
+      supplierVolume,
+      manufacturedVolume,
+      convertedItemNumber,
+      calculatedWeight,
+      manufacturedCalculatedWeight,
+    };
+  
+    updateMeasurements(JSON.stringify(updatedMeasurements));
+    updateUnsavedChanges;
+
+    //console.log(updatedMeasurements);
+
   }, [
     rawMaterialType,
     length,
@@ -202,6 +232,8 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
     manufacturedLeg2,
     unit,
   ]);
+
+
 
 
   return (
@@ -244,6 +276,26 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
           </select>
             </div>
       
+            {rawMaterialType === "other" ? (
+              <>
+                <div className="p-2 text-center font-bold">
+                  Conversion Ratio
+                  <input
+                    className="bg-blue-100 font-normal text-blue-600 focus:outline-blue-600 text-center rounded-md px-2 py-1 border border-blue-600 w-full"
+                    type="number"
+                    value={convertedItemNumber !== null ? convertedItemNumber.toString() : ""}
+                    onChange={(e) => setConvertedItemNumber(e.target.value ? parseFloat(e.target.value) : null)}
+                  />
+                </div>
+
+
+              </>
+            )
+          :
+          (
+            <div>
+   
+
           <p className="text-center py-1 bg-gray-100 rounded-md">
             Supplier measurements
           </p>
@@ -294,6 +346,7 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
 
               </>
             )}
+
             {rawMaterialType === "rectangular tubing" && (
               <>
                 <div className="p-2 text-center font-bold">
@@ -487,7 +540,8 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
           </p>
 
         </div>
-        
+        </div>
+          )}
       </div>
     ) : (
       <div className="text-center">
@@ -570,9 +624,9 @@ const RawMaterialsDiv: React.FC<InheritedProps> = ({ measurements, isEditing }) 
           )}
         </div>
         */}
-        <p className="text-center py-1 bg-gray-100 rounded-md">
+       {rawMaterialType !== "other" && <p className="text-center py-1 bg-gray-100 rounded-md">
           Boretec measurements
-        </p>
+        </p>}
         <div className={`grid ${rawMaterialType === "rectangular tubing" ? "grid-cols-4" : rawMaterialType === "angle iron" ? "grid-cols-4" : "grid-cols-3"}`}>
           {rawMaterialType === "rectangular plate" && (
             <>

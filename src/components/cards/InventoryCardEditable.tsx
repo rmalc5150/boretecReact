@@ -30,7 +30,6 @@ interface Vendor {
   vPaymentMethod: string;
 }
 
-
 interface InventoryCardEditableProps {
   partNumber: string;
   description: string;
@@ -181,10 +180,9 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
     props.breakdownInProgress || false
   );
   const [rAndD, setRAnD] = useState(props.rAndD || false);
+  const [updatedMeasurements, setUpdatedMeasurements] = useState("");
 
-
-
-
+  //console.log(updatedMeasurements);
 
   const handleProgressToggle = () => {
     setBreakdownInProgress(!breakdownInProgress);
@@ -429,7 +427,7 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
         const weightValue = parent.querySelector(".weight")?.textContent || "";
         if (!isNaN(parseFloat(weightValue))) {
           setWeight(parseFloat(weightValue));
-        } 
+        }
 
         const parLevelValue =
           parent.querySelector(".parLevel")?.textContent || "";
@@ -512,6 +510,12 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
           // Proceed with your save logic here, using 'selectedValue'
         }
 
+        let measurementsToSave = measurements;
+        //console.log(`updatedMeasurement: ${updatedMeasurements}`);
+        if (updatedMeasurements) {
+          measurementsToSave = updatedMeasurements;
+        }
+
         const payload = {
           newContent: {
             vendors,
@@ -540,10 +544,11 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
             items,
             breakdownInProgress,
             rAndD,
+            measurements: measurementsToSave,
           },
           partNumber,
         };
-        console.log(payload);
+        //console.log(payload);
 
         const params: InvokeCommandInput = {
           FunctionName: "boretec_update_item",
@@ -1048,7 +1053,12 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
               )}
             </div>
           ) : (
-            <RawMaterialsDiv measurements={measurements} isEditing={isEditing}/>
+            <RawMaterialsDiv
+              measurements={measurements}
+              isEditing={isEditing}
+              updateUnsavedChanges={() => setUnsavedChanges(true)}
+              updateMeasurements={setUpdatedMeasurements}
+            />
           )}
           {category !== "Raw Material" && (
             <div className="p-2 text-gray-700 text-center border-r border-t border-gray-100">
@@ -1120,7 +1130,6 @@ const InventoryCardEditable: React.FC<InventoryCardEditableProps> = (props) => {
             </div>
           </div>
         )}
-
 
         {isEditing && (
           <div className="col-span-3">
