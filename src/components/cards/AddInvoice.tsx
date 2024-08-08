@@ -371,7 +371,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
 
   const calculateTotalWeight = () => {
     return items.reduce((total, item) => {
-      return total + item.weight;
+      return total + item.weight*item.quantity;
     }, 0);
   };
 
@@ -1096,7 +1096,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
                   onChange={handleExpirationChange}
                   className="border border-gray-300 rounded-lg px-2 py-1"
                 >
-                  <option value="0">Upon reciept</option>
+                  <option value="0">Upon receipt</option>
                   <option value="5">in 5 days</option>
                   <option value="15">in 15 days</option>
                   <option value="30">in 30 days</option>
@@ -1186,7 +1186,7 @@ const EstimateCardAdd: React.FC<EstimateCardAddProps> = ({ onClose }) => {
               </div>
               <div className="mt-2 font-bold">
                 <p>
-                  Total Cost: $ $
+                  Total Cost: $
                   {new Intl.NumberFormat("en-US", {
                     style: "decimal",
                     minimumFractionDigits: 2,

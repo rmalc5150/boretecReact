@@ -57,6 +57,7 @@ const InventoryCardAdd: React.FC<InventoryCardAddProps> = ({
     'Auger',
   ]
 
+  /*
   const handleVendorChange = (
     index: number,
     field: keyof Vendor,
@@ -73,6 +74,7 @@ const InventoryCardAdd: React.FC<InventoryCardAddProps> = ({
       { vName: '', vUrl: '', vPartNumber: '', vLeadTime: '', vCost: '' },
     ])
   }
+  */
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value
@@ -84,6 +86,22 @@ const InventoryCardAdd: React.FC<InventoryCardAddProps> = ({
   const handleChange = (field: string, value: string) => {
     setNewItem({ ...newItem, [field]: value })
   }
+
+  /*
+  const handleChange = (field, value) => {
+  // Convert value to a number if the field is weight or cost
+  let numericValue = field === 'weight' || field === 'cost' ? Number(value) : value;
+
+  // Ensure weight or cost cannot be negative
+  if ((field === 'weight' || field === 'cost') && numericValue < 0) {
+    console.error(`${field} cannot be negative. Setting to 0.`);
+    numericValue = 0; // Set to default value
+  }
+
+  // Update the newItem state
+  setNewItem({ ...newItem, [field]: numericValue });
+};
+  */
 
   const handleSave = async () => {
     scrollUp()
@@ -284,7 +302,7 @@ const InventoryCardAdd: React.FC<InventoryCardAddProps> = ({
                 </select>
         </div>
         <div className="text-center md:flex md:justify-center md:items-center pt-2">
-          <p className=" px-1">If on the public-facing website, this should appear as a </p>
+          <p className=" px-1">This is as a </p>
 
           <select
             value={selectedOption}
